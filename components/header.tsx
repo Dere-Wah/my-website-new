@@ -49,7 +49,7 @@ export default function Header() {
           <Button variant="ghost" asChild size="sm">
             <Link href="/" className="flex items-center gap-2">
               <HomeIcon className="h-4 w-4" />
-              <span>About me</span>
+              <span className="hidden md:block">About me</span>
             </Link>
           </Button>
 
@@ -60,7 +60,7 @@ export default function Header() {
               className="flex items-center gap-2"
             >
               <FolderIcon className="h-4 w-4" />
-              <span>Projects</span>
+              <span className="hidden md:block">Projects</span>
             </Link>
           </Button>
 
