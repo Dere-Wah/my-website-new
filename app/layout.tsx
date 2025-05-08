@@ -1,15 +1,45 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
-import Header from '@/components/header';
-import Footer from '@/components/footer';
+import "./globals.css";
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+import { Analytics } from "@vercel/analytics/react";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: 'My Portfolio',
-  description: 'Welcome to my personal portfolio showcasing my projects and skills',
+export const metadata = {
+  title: "Hi! I'm Dere",
+  description:
+    "Exploring technology through web development, AI projects, and game design.",
+  keywords: [
+    "DereWah",
+    "web development",
+    "AI",
+    "game development",
+    "projects",
+    "portfolio",
+  ],
+  openGraph: {
+    title: "DereWah – Portfolio",
+    description:
+      "Showcasing innovative projects in web development, AI, and game design.",
+    url: "https://derewah.dev",
+    images: [
+      {
+        url: "https://derewah.dev/og-image.png",
+        width: 1028,
+        height: 447,
+        alt: "DereWah Portfolio Image",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DereWah – Portfolio",
+    description:
+      "Showcasing innovative projects in web development, AI and game design.",
+    images: ["https://derewah.dev/og-image.png"],
+  },
 };
 
 export default function RootLayout({
@@ -20,6 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        <Analytics />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

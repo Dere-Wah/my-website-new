@@ -24,7 +24,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }) {
-  const project = await getProjectBySlug(params.slug);
+  const project = (await getProjectBySlug(params.slug))?.frontmatter;
 
   if (!project) {
     return {
@@ -33,8 +33,22 @@ export async function generateMetadata({
   }
 
   return {
-    title: project.frontmatter.title,
-    description: project.frontmatter.description,
+    title: `${project.title} – DereWah`,
+    description: project.description,
+    keywords: project.tags,
+    openGraph: {
+      title: project.title,
+      description: project.description,
+      url: `https://derewah.dev/projects/${project.slug}`,
+      images: [
+        {
+          url: `https://derewah.dev/images/${project.slug}.png`,
+          width: 1200,
+          height: 630,
+          alt: project.title,
+        },
+      ],
+    },
   };
 }
 
