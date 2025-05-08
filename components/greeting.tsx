@@ -1,31 +1,31 @@
 "use client";
 
-import { motion, useAnimationControls, AnimatePresence } from 'framer-motion';
-import { useEffect, useState, useRef } from 'react';
+import { motion, useAnimationControls, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 
 const waveAnimation = {
   rotate: [0, -15, 10, -15, 10, 0],
-  transition: { 
+  transition: {
     duration: 1.5,
     ease: "easeInOut",
-    times: [0, 0.2, 0.4, 0.6, 0.8, 1]
-  }
+    times: [0, 0.2, 0.4, 0.6, 0.8, 1],
+  },
 };
 
 const speechBubbleVariants = {
   hidden: { opacity: 0, y: 10, scale: 0.95 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
+  visible: {
+    opacity: 1,
+    y: 0,
     scale: 1,
-    transition: { duration: 0.3 }
+    transition: { duration: 0.3 },
   },
-  exit: { 
-    opacity: 0, 
-    y: -10, 
+  exit: {
+    opacity: 0,
+    y: -10,
     scale: 0.95,
-    transition: { duration: 0.3, ease: "easeInOut" }
-  }
+    transition: { duration: 0.3, ease: "easeInOut" },
+  },
 };
 
 export default function Greeting() {
@@ -38,12 +38,14 @@ export default function Greeting() {
 
   const handleHiClick = async () => {
     if (isAnimating.current) return;
+
     setShowSpeechBubble(false);
     isAnimating.current = true;
+    await fetch("/api/greet");
     await controls.start(waveAnimation);
     isAnimating.current = false;
-    
-    setClickCount(prev => prev + 1);
+
+    setClickCount((prev) => prev + 1);
   };
 
   const getSpeechBubbleText = (count: number) => {
@@ -55,11 +57,11 @@ export default function Greeting() {
   useEffect(() => {
     controls.start(waveAnimation);
     isAnimating.current = true;
-    
+
     const animationTimeout = setTimeout(() => {
       isAnimating.current = false;
     }, 1500);
-    
+
     const initialTimeout = setTimeout(() => {
       const initialMessage = getSpeechBubbleText(clickCount);
       setCurrentMessage(initialMessage);
@@ -86,7 +88,7 @@ export default function Greeting() {
           setCurrentMessage(newMessage);
           setShowSpeechBubble(true);
         }, 1000);
-        
+
         return () => clearTimeout(messageTimeout);
       }
     }
@@ -110,10 +112,8 @@ export default function Greeting() {
           </motion.div>
         )}
       </AnimatePresence>
-      
-      <span
-        className="bg-gradient-to-br from-foreground via-foreground/90 to-foreground/70 dark:from-blue-400 dark:via-cyan-400 dark:to-sky-400 bg-clip-text text-transparent"
-      >
+
+      <span className="bg-gradient-to-br from-foreground via-foreground/90 to-foreground/70 dark:from-blue-400 dark:via-cyan-400 dark:to-sky-400 bg-clip-text text-transparent">
         <span className="inline-block cursor-pointer" onClick={handleHiClick}>
           Hi
         </span>
@@ -123,16 +123,14 @@ export default function Greeting() {
         className="inline-block cursor-pointer"
         onClick={handleHiClick}
         style={{
-          display: 'inline-block',
-          transformOrigin: '60% 60%',
-          willChange: 'transform'
+          display: "inline-block",
+          transformOrigin: "60% 60%",
+          willChange: "transform",
         }}
       >
         👋
       </motion.span>
-      <span
-        className="bg-gradient-to-br from-foreground via-foreground/90 to-foreground/70 dark:from-blue-400 dark:via-cyan-400 dark:to-sky-400 bg-clip-text text-transparent"
-      >
+      <span className="bg-gradient-to-br from-foreground via-foreground/90 to-foreground/70 dark:from-blue-400 dark:via-cyan-400 dark:to-sky-400 bg-clip-text text-transparent">
         , I'm Dere*
         <AnimatePresence>
           {showAka && (
