@@ -30,7 +30,7 @@ const item = {
 
 export default function HeroSection() {
   return (
-    <section className="pt-12 md:pt-32">
+    <section className="pt-24 md:pt-32">
       <motion.div
         variants={container}
         initial="hidden"
