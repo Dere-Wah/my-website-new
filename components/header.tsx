@@ -42,7 +42,12 @@ export default function Header() {
     >
       <div className="flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-bold text-xl">Portfolio</span>
+          <span className="font-bold text-xl">
+            derewah
+            <span className="bg-gradient-to-br from-foreground via-foreground/90 to-foreground/70 dark:from-blue-400 dark:via-cyan-400 dark:to-sky-400 bg-clip-text text-transparent">
+              .dev
+            </span>
+          </span>
         </Link>
 
         <nav className="flex items-center gap-2">
