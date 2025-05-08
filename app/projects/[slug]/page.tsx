@@ -42,7 +42,7 @@ export async function generateMetadata({
       url: `https://derewah.dev`,
       images: [
         {
-          url: `https://derewah.dev${project.thumbnail}`,
+          url: `${project.thumbnail}`,
           width: 1200,
           height: 630,
           alt: project.title,
