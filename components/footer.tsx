@@ -1,5 +1,5 @@
+import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
-import { GitHubIcon, LinkedInIcon } from "./social-icons";
 
 export default function Footer() {
   return (
@@ -18,7 +18,7 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            <GitHubIcon className="h-5 w-5" />
+            <Icon icon="lucide:github" className="h-5 w-5" />
             <span className="sr-only">GitHub</span>
           </Link>
 
@@ -28,7 +28,7 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            <LinkedInIcon className="h-5 w-5" />
+            <Icon icon="lucide:linkedin" className="h-5 w-5" />
             <span className="sr-only">LinkedIn</span>
           </Link>
         </div>

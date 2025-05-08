@@ -1,52 +1,37 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import fs from "fs";
-import path from "path";
+export const dynamic = "force-dynamic";
+
+import { NextRequest, NextResponse } from "next/server";
+
 import matter from "gray-matter";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
+import { getProjects } from "@/lib/mdx";
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
+  res: NextResponse
 ) {
   try {
-    const { index } = req.query;
-    const idx = parseInt(index as string, 10);
+    const { slug } = await params;
+    const idx = parseInt(slug, 10);
 
     if (isNaN(idx) || idx < 0) {
-      return res.status(400).json({
-        error: 400,
-        message: "Invalid index parameter.",
-      });
+      return new Response("Invalid index parameter: " + slug, { status: 400 });
     }
 
-    // Read MDX files from file system (adjust the path as needed)
-    const projectsDir = path.join(process.cwd(), "pages/projects");
-    const files = fs
-      .readdirSync(projectsDir)
-      .filter((file) => file.endsWith(".mdx"));
+    const projects = await getProjects();
 
-    let projects = files
-      .map((filename) => {
-        const filePath = path.join(projectsDir, filename);
-        const fileContents = fs.readFileSync(filePath, "utf8");
-        const { data } = matter(fileContents);
-        const slug = filename.replace(/\.mdx$/, "");
-
-        return {
-          title: data.title,
-          date: new Date(data.date),
-          published: data.published,
-          description: data.description,
-          tags: data.tags,
-          href: `/projects/${slug}`,
-        };
-      })
-      .filter((project) => project.published)
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    projects
+      .filter((project) => project.frontmatter.published)
+      .sort(
+        (a, b) =>
+          new Date(b.frontmatter.date).getTime() -
+          new Date(a.frontmatter.date).getTime()
+      );
 
     if (idx >= projects.length) {
-      return res.status(404).json({
-        error: 404,
-        message: "Project not found.",
+      return new Response("Project not found at index " + slug, {
+        status: 404,
       });
     }
 
@@ -77,8 +62,8 @@ export default async function handler(
       return lines;
     }
 
-    const titleLines = wrapWords(project.title, 45);
-    const descLines = wrapWords(project.description, 65);
+    const titleLines = wrapWords(project.frontmatter.title, 45);
+    const descLines = wrapWords(project.frontmatter.description, 65);
 
     const TAG_HEIGHT = 22;
     const PADDING_BETWEEN_TAGS = 8;
@@ -89,7 +74,7 @@ export default async function handler(
     let currentRow: string[] = [];
     let currentRowWidth = 0;
 
-    for (const tag of project.tags) {
+    for (const tag of project.frontmatter.tags ?? [""]) {
       const tagWidth = estimateTextWidth(tag, 12, PADDING_AROUND_TAG_TEXT);
       if (currentRowWidth + tagWidth + PADDING_BETWEEN_TAGS > MAX_WIDTH) {
         tagRows.push(currentRow);
@@ -171,11 +156,14 @@ export default async function handler(
   }"
 		font-family="Segoe UI, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif"
 		font-size="12" fill="${COLORS.date}">
-		<tspan>Updated on ${new Date(project.date).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })}</tspan>
+		<tspan>Updated on ${new Date(project.frontmatter.date).toLocaleDateString(
+      "en-US",
+      {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }
+    )}</tspan>
 	</text>
 	${tagRows
     .map((row, rowIndex) => {
@@ -204,17 +192,16 @@ export default async function handler(
     .join("")}
 </svg>`;
 
-    res.setHeader("Content-Type", "image/svg+xml");
-    res.setHeader(
-      "Cache-Control",
-      "no-cache, no-store, private, must-revalidate"
-    );
-    res.setHeader("Vary", "Accept-Encoding");
-    return res.status(200).send(svg);
+    return new NextResponse(svg, {
+      headers: {
+        "Content-Type": "image/svg+xml",
+        "Cache-Control": "no-cache, no-store, private, must-revalidate",
+        Vary: "Accept-Encoding",
+      },
+    });
   } catch (err: any) {
-    return res.status(500).json({
-      error: 500,
-      message: err.message,
+    return new Response(err, {
+      status: 500,
     });
   }
 }
