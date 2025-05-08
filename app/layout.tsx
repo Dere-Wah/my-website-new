@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
+  metadataBase: new URL("https://derewah.dev"),
   title: "Hi! I'm Dere",
   description:
     "Exploring technology through web development, AI projects, and game design.",
