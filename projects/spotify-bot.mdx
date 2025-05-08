@@ -1,0 +1,90 @@
+---
+title: "Making a Spotify Bot that follows everyone."
+layout: "@layouts/blogLayout.astro"
+date: "2024-08-31"
+description: "There's a chance you're followed by one of these accounts on Spotify."
+tags: ["Spotify", "Bots"]
+published: true
+thumbnail: "/assets/blog/spotify-bot/profile.png"
+---
+import { Shield } from "../components/ui/shield";
+
+# Can You Follow Every Single Person on the Planet on Spotify?
+
+![The bot in question](/assets/blog/spotify-bot/other_profile.png)
+
+A few months ago, during a university lecture, I came across a Twitter post about certain accounts that were seemingly following every single person on Spotify. Naturally, I was curious to see if I was one of their followers. To my surprise, I was! I even asked some of my friends, and they too found these mysterious accounts in their follower lists. But how was this possible?
+
+![My result](/assets/blog/spotify-bot/profile.png)
+
+If you want to view the bot check out this [**github repo**](https://github.com/Dere-Wah/SpotifyFollowers)
+
+---
+
+# The Two Main Challenges
+
+When considering this from a coder's perspective, two main challenges come to mind:
+
+## 1. The Act of Following Millions of Users
+
+First, there's no way someone could manually follow millions of users. With numbers reaching 9 million, it's far too many for any single person—or even a team—to handle. My initial thought was that Spotify must have some sort of exposed API that facilitates this. To my surprise, it was even simpler! There’s an official way to send API requests to follow someone on Spotify, provided you know their username.
+
+## 2. Finding Every User on the Platform
+
+The second challenge is discovering all the users on Spotify. There's no central place with a comprehensive list of users, so you need a way to "discover" each username automatically. Think about this in a broader sense: without the internet, how would you go about meeting as many people as possible? The key is **recursion**. 
+
+You start with one person, ask them to introduce you to everyone they know, then repeat this process with every new person you meet. Over time, you’d eventually meet almost everyone in the world (this skips over some graph theory concepts like the completeness of a graph and the idea that every node is connected).
+
+Similarly, on Spotify, you could start with a random "patient zero" user, ideally someone with a large number of followers. You would query their follower and following lists, and then repeat this process with all the new users you discover. While this method won’t guarantee you’ll follow everyone—since some accounts may have zero followers and follow no one—it’s a solid strategy for reaching a large number of users.
+
+---
+
+# The Technical Challenges
+
+## Spotify API Endpoint Issues
+
+Initially, I was thrilled to find an endpoint in the Spotify API documentation that could query user information. Each user object returned by the API included fields like "followers" and "followings," which, according to the documentation, provided lists of all mutual accounts. However, when I tried to use this endpoint, it displayed a message that it was "not available at the moment." 
+
+![Endpoint disabled at the moment](/assets/blog/spotify-bot/null.png)
+
+My guess is that Spotify disabled this endpoint after people started abusing it to gain followers. But not all hope is lost! Given a user ID, you can still visit their profile page on the Spotify website, go to the `/followers` and `/followings` pages, and extract a list of the first 500 users. While this method isn’t ideal—requiring a browser tab with Selenium running while scraping—it’s still a reliable way to access usernames. Using this approach, I managed to gather about 800,000 unique users.
+
+![One of the many follow lists I scraped](/assets/blog/spotify-bot/scraped.png)
+
+## Spotify Engineers Are Working to Solve This
+
+The next issue arose when I began sending API requests to follow users. You can send requests with a list of up to 20 users you want to follow at a time. Initially, this worked well, but over time, the process became slower, and I started encountering Error 500 in about 50% of my requests. 
+
+Spotify's API documentation humorously notes, "Our engineers are doing their best to prevent this from showing up, but if you still see this, whoopsie doopsie, sorry!" Despite my efforts to tweak the bot—adjusting the rate of follow requests and the number of user IDs per request—nothing seemed to help. Eventually, I concluded that Spotify must have implemented countermeasures against spam requests.
+
+![The error in question](/assets/blog/spotify-bot/error500.png)
+
+Interestingly, when I revisited the project a few months later, I noticed more consistent results, with a limit of about 300 follow requests per day. This change was also visible in the app itself! If you send over 300 requests, your latest ones are automatically rejected by the backend. While it’s an interesting limitation, it’s fair considering the social aspect of the app isn’t used that extensively.
+
+---
+
+# Spotify, Am I Banned?
+
+![Takedown email. I received 3 of these on 3 different accounts](/assets/blog/spotify-bot/takedown.png)
+
+An amusing part of this journey was that I often received notifications of the termination of my API and Spotify accounts shortly after starting the bot. The funny thing was, the account never actually got terminated! Despite receiving these emails, my account remained active, and the API keys continued to work.
+
+---
+
+# Monetizing This: Is It Possible?
+
+Naturally, the first question that comes to mind is: **Can money be made from this?**
+
+Well, I tried. I created some playlists with generic names, like "Halloween Vibes" (it was around Halloween), and people actually started liking and following them! I also included an email address in one of the playlists, just to see if anyone would contact me. To my surprise, some artists reached out, asking to be added to the playlist. 
+
+Although I didn’t make any money and ignored the emails since the project was already over, it’s clear there’s potential to offer a service if you have successful playlists. There is demand, especially if your playlist gains popularity.
+
+I also created another playlist titled "How to Follow Everyone" to see if anyone would reach out to me asking about the bot. And they did! I received numerous messages from people interested in the bot. Again, I didn’t sell any copies of it, but it’s evident that this could be a viable service.
+
+Eventually, since the endpoint became rate-limited and the project was well-protected, I published a revised version of the follow bot and scraper [**on github**](https://github.com/Dere-Wah/SpotifyFollowers) on GitHub. **Note:** This method no longer works!
+
+---
+
+I hope you enjoyed this exploration! Check out my other blog posts—many of them cover similar topics like bots and automation.
+
+---

@@ -1,0 +1,99 @@
+---
+title: "Developing My Own Version of Spyfall."
+date: "2025-05-06"
+description: "Creating a webapp for the social deduction game SpyFall."
+tags: ["Web Dev", "Game Dev"]
+published: true
+thumbnail: "/assets/blog/spyfall/new.png"
+---
+import { Shield } from "../components/ui/shield";
+
+Spyfall may not be a super popular game, but I find it incredibly fun. I first discovered it while watching some **Node** videos on YouTube, and I immediately fell in love with it. As a huge fan of social deduction games, Spyfall hit all the right notes for me. The premise is simple: everyone knows a specific location (chosen randomly through cards or an app)—everyone except for the spy. The goal is for players to ask each other subtle questions about the location to figure out who the spy is. The twist? The spy can win by correctly guessing the location before being discovered.
+
+![Node videos](/assets/blog/spyfall/node.png)
+
+I’ve played Spyfall online using some existing websites, but I wanted to create my own version. A couple of years ago, I made a **Telegram Bot** for it, ambitiously aiming to offer the game to everyone, not just my group of friends. It had features like lobby management and a full-fledged game system, but it never gained much traction—mainly because it was on Telegram. I always knew the platform choice would be an issue, but I was limited by my skills at the time.
+
+![The original TG bot I made](/assets/blog/spyfall/telegram2.png)
+
+Now, with a better grasp of **React**, I decided to revisit this project and build a web-based version. It was the perfect opportunity to combine something I loved and a chance to test out my new skills. Plus, this time, I wanted to make some tweaks to the existing game formula.
+
+[**GAME LINK**](https://spyfall.derewah.dev)
+
+## Disclaimer
+
+This article refers to the old version of spyfall. The old version was a nice prototype, but it was hard to maintain.
+And the frontend... well, you could tell it was my first shot at using react. On top of this, the techstack I used was not the best.
+
+Basically, a recode of this project was something long due... So that's the reason why the actual app will look different from what I talk about in here!
+If you wanna visit the old app, you can [**here**](https://spyfall-lac.vercel.app/), but the backend won't be active, so it will be basically non functional.
+
+## Features I Wanted to Add
+
+In addition to basic Spyfall functionality, I wanted to improve the user experience with a few features that I felt were lacking in other versions:
+
+**Clear List of Locations for the Spy:** It’s frustrating for the spy to ask, "What are the possible locations?" and immediately give themselves away. I wanted the spy to always have access to this information discreetly.
+
+![Gif assignation](/assets/blog/spyfall/loc.gif)
+
+**Voting System:** Inspired by **Among Us**, I envisioned a voting system where players could interactively cast votes on who they think the spy is.
+
+![Player and spy vote](/assets/blog/spyfall/vote.png)
+
+## Backend Development with FastAPI
+
+I started by developing the backend using **FastAPI**. My initial task was to create the lobby system. Right now, you can ping an API endpoint, and the backend will generate a lobby for you, returning a unique string code that allows other players to join.
+
+![Backend confirmation of lobby creation](/assets/blog/spyfall/insomnia1.png)
+
+For real-time communication, I had to learn **WebSockets**—a protocol I had studied but never used before. Rather than follow a tutorial, I built everything from scratch. Here’s how I approached it:
+
+1. **Connection Management:** I created a connection manager—a singleton object in Python that tracks all open WebSocket connections. Players connect via a WebSocket URL formatted like this: `ws://ip:8000/ws/{lobby_id}/{username}`. This way, I could link each connection to both a lobby ID and a username, ensuring no name conflicts across different lobbies.
+   
+2. **Message Handling:** I designed my own protocol for client-server communication. Instead of using libraries that fire events based on WebSocket messages, I implemented a simple multiplexer that interprets keywords in the messages and triggers specific backend commands. For example, when a game starts, the backend ensures that only the **VIP** (the first player in the lobby) can send the "start" command.
+
+3. **Redacting Information:** To prevent cheating, I had to carefully manage what information is sent to clients. For example, if I send player data like `is_spy: true` to everyone, even though my frontend hides this info, players could still inspect network requests and cheat. So, I redact sensitive details such as who the spy is and the location data.
+
+4. **Lobby Presets:** I added the ability to select "presets" for the game—sets of locations players can choose from. Right now, there’s only one preset, but I plan to add more themes like "Marvel locations" and "Historical places."
+
+## Frontend Development
+
+Once the backend was functional, I moved on to the frontend. The main tasks were:
+
+1. **Matchmaking System:** Players need to be able to create a game, join a lobby, and see the current game status.
+   
+2. **Dynamic Game Screens:** The frontend displays different screens based on the game’s state and player roles. If you’re the spy, you see a list of locations. If you’re not, you see the voting interface and players’ votes. When the game ends, the results and winners are shown.
+
+Handling corner cases was particularly tricky. For instance, I had to account for situations where:
+
+1. A player quits and only one remains (auto-terminate the game).
+
+2. The spy quits early (also auto-terminate).
+
+3. Players spam API requests to create lobbies without joining (I added an expiration timer to clean up empty lobbies).
+
+![Everyone left screen](/assets/blog/spyfall/left.png)
+
+## Final Features
+
+One feature I planned to implement is **duplicate name detection**. Before, if two players connected with the same name, the system treated them as the same player. I want to reject duplicate names and notify the player that they need to pick a unique one.
+
+Additionally, I’m working on improving the **joining system**. Currently, the system directly creates a WebSocket connection when joining a lobby. If the connection fails, it throws an error without providing details like "lobby full" or "game already started." My new approach will poll an endpoint first, verify lobby details, and then create the WebSocket connection based on that information.
+
+![Lobby not found](/assets/blog/spyfall/lobbynotfound.png)
+
+Finally, I forgot to strip players’ roles in the lobby update message. While I removed the spy’s identity, I left the player roles visible, which allows savvy players to deduce who the spy is. My fix was to only include the role of the player receiving the message, ensuring that no one can peek into others' roles.
+
+## Final Setup and Deployment
+
+With the game logic and frontend done, I spent a few hours setting up the backend server. I used **NGINX** as a reverse proxy for incoming requests, forwarding them to the FastAPI backend.
+
+One feature I’m considering adding is a **time-based cooldown** for different phases of the game. Rather than use a timer, I can work with the expiration variable I mentioned earlier to dynamically calculate how much time is left in a phase. This would let the backend be more responsive without relying on timers that I might forget to clear.
+
+---
+
+I hope you give this version of Spyfall a try with your friends! Let me know what you think, and feel free to check out some of my other projects.
+
+[**GAME LINK**](https://spyfall.derewah.dev)
+
+---

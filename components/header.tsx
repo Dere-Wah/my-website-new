@@ -1,0 +1,66 @@
+"use client";
+
+import Link from 'next/link';
+import { ModeToggle } from './mode-toggle';
+import { HomeIcon, FolderIcon } from 'lucide-react';
+import { Button } from './ui/button';
+import { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
+
+export default function Header() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 50);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const scrollToProjects = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const projectsSection = document.getElementById('projects');
+    if (projectsSection) {
+      projectsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+  
+  return (
+    <header className={cn(
+      "sticky top-0 z-50 w-full transition-all duration-200",
+      isScrolled 
+        ? "bg-background/80 backdrop-blur-md border-b"
+        : "bg-transparent"
+    )}>
+      <div className="container flex h-16 items-center justify-between px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="font-bold text-xl">Portfolio</span>
+        </Link>
+        
+        <nav className="flex items-center gap-4">
+          <Button variant="ghost" asChild size="sm">
+            <Link href="/" className="flex items-center gap-2">
+              <HomeIcon className="h-4 w-4" />
+              <span>About me</span>
+            </Link>
+          </Button>
+          
+          <Button variant="ghost" asChild size="sm">
+            <Link href="/#projects" onClick={scrollToProjects} className="flex items-center gap-2">
+              <FolderIcon className="h-4 w-4" />
+              <span>Projects</span>
+            </Link>
+          </Button>
+          
+          <ModeToggle />
+        </nav>
+      </div>
+    </header>
+  );
+}

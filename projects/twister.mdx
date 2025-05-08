@@ -1,0 +1,136 @@
+---
+title: "Simulating Twitter Cancel Culture in a videogame."
+layout: "@layouts/blogLayout.astro"
+date: "2024-10-24"
+description: "A devlog about the first game jam I ever took place in (Brackeys Game Jam 2024.2)."
+tags: ["AI", "Game Dev"]
+published: true
+thumbnail: "/assets/blog/twister/image.png"
+---
+import { Shield } from "../components/ui/shield";
+
+![A screenshot from the final game.](/assets/blog/twister/penguinz1.png)
+
+A few months ago, I decided to participate in my first game jam. It was the end of summer, and I had a week left before starting my final year of university. With my exams done and nothing else on my plate, I opened Itch.io and started browsing for upcoming game jams. That’s when I stumbled upon the **Brackeys Game Jam 2024.2**, which was just about to begin.
+
+At first, I wasn’t sure whether to join. The theme hadn’t been announced, and I had no idea what kind of game I wanted to make or even what engine to use. It was one of those last-minute decisions where I thought, *Why not?* 
+
+One thing worth noting is that I had just finished developing my first-ever web-based game, called <Shield icon="twemoji:detective" href="https://spyfall.derewah.dev" text="SpyFall" />. It was a social deduction game with a React front-end and a backend server for networking. Having just taught myself React, I was still fresh with excitement from that project (you can read more about it in another blog post <Shield icon="mdi:alpha-d-circle-outline" url="./spyfall ">HERE</ Shield>).
+
+## Getting Started: The Theme and Initial Hesitation
+
+After joining the game jam’s Discord community, I engaged with the other participants, and when the jam officially kicked off, the theme was finally revealed: **Calm Before the Storm**.
+
+As a first-time participant, one big takeaway I’d like to share is this: **joining the community is a huge advantage**. Engaging with others, sharing progress, and getting swept up in the general excitement made a massive difference for me. If I had just worked on my own, I probably would’ve given up after an hour, thinking my game was terrible. But thanks to the feedback and motivation from the community, I stuck with it. In the end, my game ranked **#6 in Innovation** out of 1,500 entries!
+
+---
+
+## The Game Idea: Inspired by Cancel Culture
+
+The idea for my game wasn’t entirely my own. I’ve always been fascinated by “mass movements” like cancel culture—how they start and develop. While browsing ideas in the Discord chat, one particular message from another participant caught my eye. It said something along the lines of:
+
+![The message mentioned above.](/assets/blog/twister/discord.png)
+
+This immediately sparked an idea for a game. I started thinking about how I could implement it: using AI to evaluate tweets, determining how “angry” your followers are, and figuring out the game loop. The concept wasn’t a traditional, linear game, which meant I had to get creative with how I gamified the experience.
+
+---
+
+## Prototyping and Building the Foundation
+
+I was still hesitant about fully committing to the jam, so I made a small prototype and shared it on the Discord server. Surprisingly, people liked it, so I kept going.
+
+The first step was adding a simple interface where players could type tweets. I also included a few stat bars, though I wasn’t entirely sure how to use them yet. I was thinking of adding “Bannable” and “Controversial” values, but at this point, everything was random.
+
+![First version.](/assets/blog/twister/image.png)
+
+Next, I added a basic tutorial to set the premise of the game (yes, it was a wall of text—eww, I know).
+
+![The premise of the game.](/assets/blog/twister/intro.png)
+
+I also created a login screen that led into the game, though it didn’t really serve a purpose beyond getting users familiar with the interface. I ended up scrapping the “About You” section because I couldn’t find a useful way to leverage it.
+
+<video controls className="w-full flex flex-row justify-center aspect-video">
+  <source src="../assets/blog/twister/logging_in.mp4" type="video/mp4" />
+</ video>
+
+My final vision for the game included features like replying to comments, having persistent conversations with AI-generated repliers, DMs, and even “drama events” where you’d battle against specific users to affect your reputation. Unfortunately, with only one week to work on it, I had to scrap a lot of those ideas.
+
+---
+
+## Rating Tweets: The Challenges of Using AI
+
+To rate the tweets, I wanted to use OpenAI’s API to determine whether the content was controversial. But I ran into a few challenges:
+
+**Security**: How do you securely store an API key on a frontend web app? I didn’t want anyone snooping around my code and using my OpenAI key at my expense. To solve this, I built a backend that acted as a middleman. The web app would send tweets to my backend, which would then call the OpenAI API, get a score, and send it back to the frontend. 
+
+This backend solution had other advantages too: I could dynamically adjust how the tweets were rated, track game stats, and control costs, all without exposing my API key.
+
+**Cost**: I discovered that OpenAI offers a free “moderation” endpoint, which auto-flags content based on various metrics like hate speech, violence, and offensive language.
+
+![Endpoint explaining it was free. Thanks OpenAI!](/assets/blog/twister/freemod.png)
+
+![Moderation values.](/assets/blog/twister/moderation.png)
+
+I used this endpoint to create a “low-res flagging” system, where less controversial tweets would be flagged early in the game. As the game progressed, it would switch to a more in-depth “high-res flagging,” using OpenAI to detect not just offensive content, but controversial opinions as well. This helped balance gameplay while also managing costs.
+
+![The (primitive) los res flagging functions.](/assets/blog/twister/scores.png)
+
+---
+
+## Adding Interactivity: Comments, Apologies, and Gameplay Loop
+
+To make the game more interactive, I added **AI-generated comments**. Depending on the controversy level, different types of commenters would appear—“Edgy,” “Enraged,” “Trolling,” or “Offended.” They would react to your posts with relevant comments.
+
+I also introduced a memory system. Commenters would remember your previous tweets, so if you apologized for something, the AI could gauge whether your apology was sincere. This led to some fun interactions where a truthful apology could reduce your controversy score.
+
+<video controls className="w-full flex flex-row justify-center aspect-video">
+  <source src="../assets/blog/twister/comments.mp4" type="video/mp4" />
+</ video>
+
+Next, I implemented a “followers” counter to give the game a clear goal. The idea was to **survive as long as possible** by maintaining your follower count. If your tweets were too tame, people would lose interest and unfollow you. On the other hand, staying too controversial for too long would get you banned or canceled.
+
+<video controls className="w-full flex flex-row justify-center aspect-video">
+  <source src="../assets/blog/twister/progress.mp4" type="video/mp4" />
+</ video>
+
+---
+
+## The Final Stretch: Features and Fun Additions
+
+One of the fun mechanics I added was the ability to delete tweets. Deleting a tweet would instantly drop your “Bannable” score to zero, but people would notice, and the comments would update to reflect their anger at the deletion. 
+
+<video controls className="w-full flex flex-row justify-center aspect-video">
+  <source src="../assets/blog/twister/deletion.mp4" type="video/mp4" />
+</ video>
+
+I also added “event triggers” for things that commonly happen in cancel culture. For example, one of my favorites was a random event where **Penguinz0** (a popular YouTuber) would tweet about your situation, causing a surge in controversy. 
+
+<video controls className="w-full flex flex-row justify-center aspect-video">
+  <source src="../assets/blog/twister/penguinz0.mp4" type="video/mp4" />
+</ video>
+
+To make the game less frustrating, I included a “heart” and “warning” counter at the top of the screen to show how close you were to being canceled. 
+
+<video controls className="w-full flex flex-row justify-center aspect-video">
+  <source src="../assets/blog/twister/full.mp4" type="video/mp4" />
+</ video>
+
+---
+
+## The Results: #6 in Innovation!
+
+When the jam ended, voting began, and I received a lot of positive feedback. Players found the concept innovative, and I knew it would perform well in that category. I wasn’t too concerned about other categories since my game was more of an experiment than a traditional gaming experience.
+
+In the end, I was thrilled to rank **#6 in Innovation**! For my first game jam, that was a huge accomplishment.
+
+![Final ranking.](/assets/blog/twister/ranking.png)
+
+_The website says #7, but the original #1 submission was disqualified for manipulating votes in their favour_
+
+Looking back, I’m certain that sharing my progress on Discord and engaging with the community was what kept me going. Seeing others excited about my game and giving me feedback made a world of difference. Plus, writing this blog post was super easy because I just looked back at my Discord messages from the jam!
+
+That’s a wrap on my first-ever game jam. I hope you enjoyed my story, and I’m definitely going to take part in more jams in the future. Stay tuned, and thanks for reading!
+
+Play <Shield icon="mdi:weather-windy" url="https://derewah.itch.io/twister">Twister</Shield> directly in the browser on Itch.io.
+
+
