@@ -33,19 +33,19 @@ export default function About() {
           </p>
 
           <p className="text-lg leading-relaxed italic">
-            You can never know what you'll find me working on...
+            You never know what I'll be working on next...
           </p>
           <p className="text-lg leading-relaxed">
-            One day I might be crafting a sleek web application, the next day
-            training an AI model to simulate a game. Sometimes I'm diving into
-            game development, creating (bad) indie games, or maybe you'll catch
-            me building automated content pipelines.
+            One day, I could be crafting a cutting-edge web application; the
+            next, I'm training an AI model for simulation. I might dive into
+            game development, create quirky indie projects, or build automated
+            content pipelines.
           </p>
 
           <p className="text-lg leading-relaxed">
-            Every project is a new adventure, a chance to explore uncharted
-            territories in tech. I seek the challenge of learning something new,
-            and sharing with people projects I create.
+            For me, every project is an adventure, a chance to explore new
+            frontiers in tech. I thrive on the challenge of learning something
+            fresh and love sharing the projects I bring to life.
           </p>
         </div>
       </motion.div>
