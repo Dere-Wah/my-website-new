@@ -1,8 +1,9 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 import path from "path";
 import fs from "fs/promises";
 import matter from "gray-matter";
+import { getProjects } from "@/lib/mdx";
 
 export const dynamic = "force-dynamic"; // disable caching
 export const revalidate = 0;
@@ -49,11 +50,14 @@ async function sendDiscordNotification(
 
 // GET handler
 export async function GET(
-  _req: NextRequest,
-  { params }: { params: { slug: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
+  res: NextResponse
 ) {
   try {
-    const index = parseInt(params.slug, 10);
+    const { slug } = await params;
+    console.log(slug);
+    const index = parseInt(slug, 10);
 
     if (isNaN(index)) {
       return new Response(
@@ -62,32 +66,15 @@ export async function GET(
       );
     }
 
-    // Load and parse .mdx project files from /app/projects or /content/projects
-    const files = await fs.readdir(path.join(process.cwd(), "app/projects"));
-    const projects = [];
+    console.log(index);
 
-    for (const file of files) {
-      if (file.endsWith(".mdx")) {
-        const content = await fs.readFile(
-          path.join(process.cwd(), "app/projects", file),
-          "utf-8"
-        );
-        const { data } = matter(content);
+    let projects = await getProjects();
 
-        if (data.published) {
-          const slug = file.replace(/\.mdx$/, "");
-          projects.push({
-            title: data.title,
-            date: new Date(data.date),
-            description: data.description,
-            tags: data.tags,
-            href: `/projects/${slug}`,
-          });
-        }
-      }
-    }
-
-    projects.sort((a, b) => b.date.getTime() - a.date.getTime());
+    projects.sort(
+      (a, b) =>
+        new Date(b.frontmatter.date).getTime() -
+        new Date(a.frontmatter.date).getTime()
+    );
 
     if (index < 0 || index >= projects.length) {
       return new Response(
@@ -98,13 +85,17 @@ export async function GET(
 
     const project = projects[index];
 
-    sendDiscordNotification(project.title, project.href).catch(console.error);
+    sendDiscordNotification(
+      project.frontmatter.title,
+      project.frontmatter.href
+    ).catch(console.error);
 
+    console.log(project.frontmatter);
     // Note: must redirect from client-side — `redirect()` only works in Server Components.
     return new Response(null, {
       status: 307,
       headers: {
-        Location: project.href,
+        Location: project.frontmatter.href,
       },
     });
   } catch (err: any) {
