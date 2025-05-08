@@ -39,10 +39,10 @@ export async function generateMetadata({
     openGraph: {
       title: project.title,
       description: project.description,
-      url: `https://derewah.dev/projects/${project.slug}`,
+      url: `https://derewah.dev/og-image.png`,
       images: [
         {
-          url: `https://derewah.dev/images/${project.slug}.png`,
+          url: `https://derewah.dev/og-image.png`,
           width: 1200,
           height: 630,
           alt: project.title,
