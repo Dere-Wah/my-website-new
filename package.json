@@ -59,6 +59,7 @@
     "lucide-react": "^0.446.0",
     "next": "13.5.1",
     "next-mdx-remote": "^4.4.1",
+    "next-sitemap": "^4.2.3",
     "next-themes": "^0.3.0",
     "postcss": "8.4.30",
     "react": "18.2.0",
