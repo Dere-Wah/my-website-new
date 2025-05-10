@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 const DISCORD_WEBHOOK_URL = process.env.NOTIFY_WEBHOOK || "";
 
 // Send notification to Discord
