@@ -1,0 +1,171 @@
+---
+title: "How I Grew a Twitter Bot to 80K Followers and Made Money Doing Nothing"
+date: "2025-05-10"
+description: "A deep dive into my early experiments with Twitter automation — from a casual social experiment to a surprisingly profitable side hustle."
+tags: ["Automation", "Twitter Bots", "APIs", "Python", "Growth Hacking"]
+published: true
+thumbnail: "/assets/blog/twitter-bot/thumbnail.png"
+---
+
+import { Shield } from "../components/ui/shield";
+
+This story goes back quite a bit. This project was one of the first I ever created and marked one of my initial experiments with task automation using APIs. It dates back to a time before Twitter was rebranded as X, and even before Creator Payouts were introduced.
+
+Exactly—this project started with **zero** monetary intent. Earning money through Twitter impressions wasn't even on the radar, and it certainly wasn’t my goal.
+
+Let’s start from the beginning.
+
+# It Started as a Social Experiment
+
+I don’t really remember how the idea came to me. Probably some YouTuber was making videos like _"How long does it take to reach 1M subscribers on a new channel?"_ However, my main inspiration was this: _how hard can it be to grow a Twitter account with the **least** effort possible?_
+
+And by _least effort_, I meant the **absolute minimum**: just write a program to automate everything, log out, and see what it could do on its own.
+
+This was back in 2021. I was teaching myself Python at the time, so I figured—why not? That’s how it all began.
+
+# My Intuition About Exploiting Twitter Replies
+
+Around that time, I was becoming more active on my personal Twitter account. Twitter isn’t very popular in Italy, so it was kind of a new world for me. I started following random accounts and slowly got into the “meta” of so-called _gimmick_ accounts—basically, accounts that posted memes around a specific theme or niche.
+
+I remember one in particular that posted the "origins" of famous memes—basically showing where they came from.
+
+While browsing these accounts, I noticed something interesting—and exploitable. Replies on Twitter were sorted by top likes. To reach the top of the replies, people would just post random memes, often unrelated to the original tweet.
+
+On top of that, if you replied to a post more than 10 minutes after it was published (especially from big accounts), your reply would get buried under the more-liked ones posted earlier. So, the recipe was simple:
+
+- Post **as soon as possible**, ideally with automation (foreshadowing)
+- Post memes or other content designed to drive engagement    
+
+# Automating Posts and Replies
+
+I remember clearly when I started running the account. I called it **"Videos Origins"**, targeting the niche of posting the original sources of famous viral videos.
+
+I quickly wrote a Python script that used Twitter's API (which was free and open at the time) to stream new posts and publish replies or standalone tweets.
+
+Initially, I stuck with the “Videos Origins” theme. But over time, I pivoted to scraping memes from Instagram pages I liked, downloading them in bulk, and reposting them to Twitter.
+
+I don’t remember exactly how long I kept this going, but eventually, the account hit around 1.4k followers.
+
+# Focusing on Just Greentexts
+
+After reaching 1.4k followers, I paused the project. Twitter had started limiting API access, making it hard to maintain the bot.
+
+Later, I returned to the project and decided to switch the niche to **Greentexts**—a form of storytelling that originated on 4chan, the anonymous message board where, well, _all kinds of people post all kinds of stuff_.
+
+![A first update from my old telegram portfolio](/assets/blog/twitter-bot/update2.png)
+
+To get around the API limitations, I built a browser-scraping module. It would continuously refresh the Twitter homepage on my computer, parse the HTML to detect new posts, and reply to them instantly.
+
+I also made the bot "roll a dice" for each reply—with a 10% chance of posting a standalone tweet, just to keep interaction diversified.
+
+Over time, the account grew from 9.8k to over 30k followers.
+
+![Another update from my old telegram portfolio](/assets/blog/twitter-bot/update1.png)
+
+# Reaching 50k in 2 Months
+
+Around this time, I added a **Telegram interface**, letting me control the bot remotely and get notifications for errors.
+
+![Notifications from the telegram integration](/assets/blog/twitter-bot/telegram.png)
+
+Honestly, I have no idea how the bot kept running. The code was two years old, unoptimized, messy, and patched together after every API update.
+
+But hey, the account was blowing up—**50k followers in just two months**, with **5 million views in 28 days**. And I wasn’t lifting a finger. Just ran the bot on my PC and let it do its thing.
+
+![The stats from a couple of months running the bot.](/assets/blog/twitter-bot/stats.jpg)
+
+# Twitter Rebrand and Meta Shifts
+
+A few months later, I slowly stopped working on the bot. Twitter (now X) introduced stricter limits on the UI API, making stability difficult.
+
+Around the same time, Elon Musk acquired Twitter and rolled out major changes:
+
+- Paid subscriptions (including Blue checkmarks)
+- Creator Payouts based on impressions
+    
+At first, I didn’t care. I had moved on to other projects.
+
+But then I started seeing creators posting their earnings from impressions. And they were earning serious money. Honestly, with the traffic my account had been getting, I realized I might’ve missed out.
+
+So I gave it one last shot. I updated the bot using a new strategy with HTML scraping.
+
+![Applying for a checkmark](/assets/blog/twitter-bot/checkmark.jpg)
+
+This time, I had to **invest real money**—specifically €14/month for a Twitter Blue subscription. It gave the account more visibility in replies and enabled monetization. Given the potential earnings, it was worth a try.
+
+# How Much Did I Make?
+
+While I won’t share the exact amount, I can say I earned **about half a part-time salary** while doing absolutely nothing.
+
+Everything was automated—posts, replies, the works. People were loving it. At one point, **Elon Musk** even replied to one of the tweets. (Funny thing: this happened in February 2024, and I only noticed it in 2025.)
+
+![The elon interaction with my automated posts](/assets/blog/twitter-bot/elon.jpg)
+
+_This was really surprising to discover, especially 1 year later_
+
+The account kept growing and now sits at around **80k followers**.
+
+# Applying the Formula to More Accounts
+
+Naturally, the next step was to replicate the success:
+
+- Pick a niche 
+- Download a bulk set of content from Reddit or other sources
+- Run the bot with a different token
+- Buy Twitter Blue for the new account
+- Sleep and repeat
+
+And that’s exactly what I did. Every month, using revenue from the previous account, I created a new one and subscribed it to Twitter Blue.
+
+**Verification** was critical. Until verified, the account had to avoid **any** suspicious activity—no automation, no scraping. Twitter’s human moderators would sometimes check for TOS violations, and I lost a couple of accounts this way (–€14 per account).
+
+At peak, I had four active accounts: one posting satisfying videos, one with random memes, another with AI-generated Disney posters, and of course the original greentexts.
+
+![Receiving payouts](/assets/blog/twitter-bot/payout.jpg)
+
+Testing niches was easy. If one didn't work, I’d swap the meme folder and pivot the theme.
+
+# Maximizing Revenue by Hand-Picking Memes
+
+While other accounts did okay, the greentexts account remained the primary earner. It was the most established, so I gave it more attention.
+
+One interesting insight: **the type of greentexts posted made a huge difference**.
+
+The bot had two posting modes:
+
+- **Recent Mode**: Scrape the last 30 hot posts from the greentexts subreddit and cycle through them.
+    
+- **Top Mode**: Scrape the all-time top 1000 posts once and loop them indefinitely.
+    
+![The bot scraping reddit](/assets/blog/twitter-bot/downloading.png)
+
+Turns out, people **love reading the same posts over and over again**. The second mode nearly **doubled** revenue compared to the first.
+
+At first, I switched modes manually—activating the “Top” mode during weekends when engagement was higher. Eventually, I left it on permanently.
+
+# The Downsides of Automating Replies
+
+Since the bot replied automatically to a predefined set of accounts, it would comment on _anything_—even serious or sensitive posts.
+
+One time, someone posted a memorial for their dog, and a gimmick account I followed interacted with it. The bot replied with a random meme.
+
+
+Understandably, the original poster messaged me asking for its removal.
+
+![An unfortunate interaction](/assets/blog/twitter-bot/remove.jpg)
+
+# The Downfall of It All
+
+After a few months of running these accounts and planning new ones, X started cracking down on this kind of behavior.
+
+One by one, my accounts were banned—likely due to detection via IP tracking or behavioral analysis. Even my **personal** account, which had no suspicious activity, was banned. That one hurt—I was followed by several big creators.
+
+The only account that remains is the original **4chan_green**, sitting at around 80k followers. I’m honestly scared to even touch it.
+
+My theory is that Elon Musk’s past interactions with the account scared off moderators from banning it—but that’s just speculation.
+
+I don’t plan to bring it back online. For now, it serves as an archive and a fun story about my first steps in automation and bot development.
+
+What started as a simple experiment turned into a major project—gaining tens of thousands of followers and even earning real money.
+
+I hope you enjoyed this adventure, because I definitely did. I have more stories about automation, so feel free to check out my other blog posts.

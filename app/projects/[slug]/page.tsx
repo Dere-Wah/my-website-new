@@ -155,7 +155,7 @@ export default async function ProjectPage({
           size="sm"
           className="gap-2 -ml-2 transition-all duration-300 hover:gap-3 text-sm"
         >
-          <Link href={`#`}>
+          <Link href={`../#`}>
             <ArrowLeftIcon className="h-3.5 w-3.5" /> Back
           </Link>
         </Button>
