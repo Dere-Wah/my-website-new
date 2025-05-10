@@ -2,6 +2,7 @@
 
 import { motion, useAnimationControls, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const waveAnimation = {
   rotate: [0, -15, 10, -15, 10, 0],
@@ -36,12 +37,23 @@ export default function Greeting() {
   const [showAka, setShowAka] = useState(false);
   const isAnimating = useRef(false);
 
+  useEffect(() => {
+    if (localStorage.getItem("cookie") === null) {
+      localStorage.setItem("cookie", uuidv4());
+    }
+  });
+
   const handleHiClick = async () => {
     if (isAnimating.current) return;
 
     setShowSpeechBubble(false);
     isAnimating.current = true;
-    await fetch("/api/greet");
+    const cookie = localStorage.getItem("cookie") ?? uuidv4();
+    await fetch("/api/greet", {
+      headers: {
+        "x-client-cookie": cookie,
+      },
+    });
     await controls.start(waveAnimation);
     isAnimating.current = false;
 

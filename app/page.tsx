@@ -2,6 +2,7 @@ import HeroSection from "@/components/hero-section";
 import About from "@/components/about";
 import ProjectsSection from "@/components/projects-section";
 import { getProjects } from "@/lib/mdx";
+import { v4 as uuidv4 } from "uuid";
 
 export const metadata = {
   metadataBase: new URL("https://derewah.dev"),
