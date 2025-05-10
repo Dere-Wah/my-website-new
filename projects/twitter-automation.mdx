@@ -50,13 +50,16 @@ I don’t remember exactly how long I kept this going, but eventually, the accou
 
 ![People started catchin up, but it wasn't really a problem](/assets/blog/twitter-bot/catchingup.png)
 
+_People started catching up, but it wasn't really a problem_
+
 # Focusing on Just Greentexts
 
 After reaching 1.4k followers, I paused the project. Twitter had started limiting API access, making it hard to maintain the bot.
 
 Later, I returned to the project and decided to switch the niche to **Greentexts**—a form of storytelling that originated on 4chan, the anonymous message board where, well, _all kinds of people post all kinds of stuff_.
 
-![A first update from my old telegram portfolio](/assets/blog/twitter-bot/update2.png)
+![Greentexts, according to urban dictionary.](/assets/blog/twitter-bot/urbandict.png)
+_['greentext'](https://www.urbandictionary.com/define.php?term=greentext), according to Urban Dictionary_
 
 To get around the API limitations, I built a browser-scraping module. It would continuously refresh the Twitter homepage on my computer, parse the HTML to detect new posts, and reply to them instantly.
 
@@ -64,8 +67,10 @@ I also made the bot "roll a dice" for each reply—with a 10% chance of posting 
 
 Over time, the account grew from 9.8k to over 30k followers.
 
-![Another update from my old telegram portfolio](/assets/blog/twitter-bot/update1.png)
+![A first update from my old telegram portfolio](/assets/blog/twitter-bot/update2.png)
 
+![Another update from my old telegram portfolio](/assets/blog/twitter-bot/update1.png)
+_Some updates from a telegram channel where I was tracking progress on my projects_
 # Reaching 50k in 2 Months
 
 Around this time, I added a **Telegram interface**, letting me control the bot remotely and get notifications for errors.
@@ -77,7 +82,7 @@ Honestly, I have no idea how the bot kept running. The code was two years old, u
 But hey, the account was blowing up—**50k followers in just two months**, with **5 million views in 28 days**. And I wasn’t lifting a finger. Just ran the bot on my PC and let it do its thing.
 
 ![The stats from a couple of months running the bot.](/assets/blog/twitter-bot/stats.jpg)
-
+_The stats from a couple of months of running the bot_
 # Twitter Rebrand and Meta Shifts
 
 A few months later, I slowly stopped working on the bot. Twitter (now X) introduced stricter limits on the UI API, making stability difficult.
@@ -125,9 +130,10 @@ And that’s exactly what I did. Every month, using revenue from the previous ac
 
 At peak, I had four active accounts: one posting satisfying videos, one with random memes, another with AI-generated Disney posters, and of course the original greentexts.
 
-![Receiving payouts](/assets/blog/twitter-bot/payout.jpg)
-
 Testing niches was easy. If one didn't work, I’d swap the meme folder and pivot the theme.
+
+![Receiving payouts](/assets/blog/twitter-bot/payout.jpg)
+_Payouts emails. These were always nice to receive_
 
 # Maximizing Revenue by Hand-Picking Memes
 
@@ -138,10 +144,10 @@ One interesting insight: **the type of greentexts posted made a huge difference*
 The bot had two posting modes:
 
 - **Recent Mode**: Scrape the last 30 hot posts from the greentexts subreddit and cycle through them.
+![The bot scraping reddit](/assets/blog/twitter-bot/downloading.png)
     
 - **Top Mode**: Scrape the all-time top 1000 posts once and loop them indefinitely.
     
-![The bot scraping reddit](/assets/blog/twitter-bot/downloading.png)
 
 Turns out, people **love reading the same posts over and over again**. The second mode nearly **doubled** revenue compared to the first.
 
