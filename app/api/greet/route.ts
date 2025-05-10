@@ -32,20 +32,7 @@ async function sendDiscordNotification() {
     console.error("Error sending Discord notification:", error);
   }
 }
-
-// GET handler
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
-  res: NextResponse
-) {
-  try {
-    await sendDiscordNotification().catch(console.error);
-    return new Response(null, { status: 200 });
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: 500, message: err.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+export async function GET(req: NextRequest) {
+  await sendDiscordNotification();
+  return new Response(null, { status: 200 });
 }
