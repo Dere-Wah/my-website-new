@@ -40,7 +40,7 @@ export async function GET(
   res: NextResponse
 ) {
   try {
-    sendDiscordNotification().catch(console.error);
+    await sendDiscordNotification().catch(console.error);
     return new Response(null, { status: 200 });
   } catch (err: any) {
     return new Response(JSON.stringify({ error: 500, message: err.message }), {

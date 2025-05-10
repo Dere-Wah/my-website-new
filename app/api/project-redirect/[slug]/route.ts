@@ -85,7 +85,7 @@ export async function GET(
 
     const project = projects[index];
 
-    sendDiscordNotification(
+    await sendDiscordNotification(
       project.frontmatter.title,
       project.frontmatter.href
     ).catch(console.error);
