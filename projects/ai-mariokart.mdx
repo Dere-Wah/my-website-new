@@ -1,6 +1,5 @@
 ---
 title: "How I Trained a Neural Network to Simulate Mario Kart Gameplay"
-layout: "@layouts/blogLayout.astro"
 date: "2024-11-18"
 description: "And how you can train basically anything with this workflow!"
 tags: ["AI", "Workflow"]
@@ -22,13 +21,13 @@ In this post, I’ll guide you through my journey of setting up a neural network
 
 
 <div className="flex flex-wrap justify-center gap-1" >
-    <video autoPlay loop className="w-2/5 justify-center aspect-square">
+    <video autoPlay loop muted playsInline className="w-2/5 justify-center aspect-square">
       <source src="../assets/blog/ai-mariokart/escaping.mp4" type="video/mp4" />
     </ video>
-    <video autoPlay loop className="w-2/5 justify-center aspect-square">
+    <video autoPlay loop muted playsInline className="w-2/5 justify-center aspect-square">
       <source src="../assets/blog/ai-mariokart/turn.mp4" type="video/mp4" />
     </ video>
-    <video autoPlay loop className="w-2/5 justify-center aspect-square">
+    <video autoPlay loop muted playsInline className="w-2/5 justify-center aspect-square">
       <source src="../assets/blog/ai-mariokart/tunnel.mp4" type="video/mp4" />
     </ video>
 </div>
@@ -256,10 +255,10 @@ While collecting data, I noticed some inherent limitations in the dataset:
 These limitations highlight the importance of carefully curating datasets to cover edge cases.
 
 <div className="flex flex-wrap justify-center gap-1" >
-    <video controls loop className="w-2/5 justify-center aspect-square">
+    <video controls loop muted playsInline className="w-2/5 justify-center aspect-square">
       <source src="../assets/blog/ai-mariokart/flicker.mp4" type="video/mp4" />
     </ video>
-    <video controls loop className="w-2/5 justify-center aspect-square">
+    <video controls loop muted playsInline className="w-2/5 justify-center aspect-square">
       <source src="../assets/blog/ai-mariokart/wallhit.mp4" type="video/mp4" />
     </ video>
 </div>
