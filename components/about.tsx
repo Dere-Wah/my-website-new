@@ -38,7 +38,7 @@ export default function About() {
           <p className="text-lg leading-relaxed">
             One day, I could be crafting a cutting-edge web application; the
             next, I'm training an AI model for simulation. I might dive into
-            game development, create quirky indie projects, or build automated
+            game development, create small indie projects, or build automated
             content pipelines.
           </p>
 
