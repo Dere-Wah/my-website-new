@@ -270,13 +270,23 @@ While collecting data, I noticed some inherent limitations in the dataset:
 
 These limitations highlight the importance of carefully curating datasets to cover edge cases.
 
-<div className="flex flex-wrap justify-center gap-1" >
-    <video controls loop muted playsInline className="w-2/5 justify-center aspect-square">
-      <source src="../assets/blog/ai-mariokart/flicker.mp4" type="video/mp4" />
-    </ video>
-    <video controls loop muted playsInline className="w-2/5 justify-center aspect-square">
-      <source src="../assets/blog/ai-mariokart/wallhit.mp4" type="video/mp4" />
-    </ video>
+<div className="flex flex-wrap justify-center gap-1">
+	<SafeVideo
+		src="/assets/blog/ai-mariokart/flicker.mp4"
+		className="w-2/5 justify-center aspect-square"
+		autoPlay
+		loop
+		muted
+		playsInline
+	/>
+	<SafeVideo
+		src="/assets/blog/ai-mariokart/wallhit.mp4"
+		className="w-2/5 justify-center aspect-square"
+		autoPlay
+		loop
+		muted
+		playsInline
+	/>
 </div>
 
 In the clip above you can see some interesting details captured by the model. For instance, in clip #1 when the kart passes the finish line, you can see the time trial counter actually flicker.
