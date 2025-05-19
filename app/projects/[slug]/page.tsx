@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Shield } from "@/components/ui/shield";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import SafeVideo from "@/components/safe-video";
 
 export async function generateStaticParams() {
   const projects = await getProjects();
@@ -160,7 +161,7 @@ export default async function ProjectPage({
             "prose-blockquote:text-muted-foreground prose-blockquote:my-8"
           )}
         >
-          <MDXRemote source={content} components={{ Shield }} />
+          <MDXRemote source={content} components={{ Shield, SafeVideo }} />
         </div>
         <Button
           asChild

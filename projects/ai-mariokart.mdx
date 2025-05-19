@@ -7,6 +7,7 @@ published: true
 thumbnail: "/assets/blog/ai-mariokart/thumbnail1.png"
 ---
 import { Shield } from "../components/ui/shield";
+import { SafeVideo } from "../components/safe-video";
 
 ## Introduction
 
@@ -20,16 +21,31 @@ In this post, I’ll guide you through my journey of setting up a neural network
 </div>
 
 
-<div className="flex flex-wrap justify-center gap-1" >
-    <video autoPlay loop muted playsInline className="w-2/5 justify-center aspect-square">
-      <source src="../assets/blog/ai-mariokart/escaping.mp4" type="video/mp4" />
-    </ video>
-    <video autoPlay loop muted playsInline className="w-2/5 justify-center aspect-square">
-      <source src="../assets/blog/ai-mariokart/turn.mp4" type="video/mp4" />
-    </ video>
-    <video autoPlay loop muted playsInline className="w-2/5 justify-center aspect-square">
-      <source src="../assets/blog/ai-mariokart/tunnel.mp4" type="video/mp4" />
-    </ video>
+<div className="flex flex-wrap justify-center gap-1">
+	<SafeVideo
+		src="/assets/blog/ai-mariokart/escaping.mp4"
+		className="w-2/5 justify-center aspect-square"
+		autoPlay
+		loop
+		muted
+		playsInline
+	/>
+	<SafeVideo
+		src="/assets/blog/ai-mariokart/turn.mp4"
+		className="w-2/5 justify-center aspect-square"
+		autoPlay
+		loop
+		muted
+		playsInline
+	/>
+	<SafeVideo
+		src="/assets/blog/ai-mariokart/tunnel.mp4"
+		className="w-2/5 justify-center aspect-square"
+		autoPlay
+		loop
+		muted
+		playsInline
+	/>
 </div>
 
 ---
