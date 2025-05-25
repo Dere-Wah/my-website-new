@@ -145,22 +145,13 @@ export default function Greeting() {
       <span className="whitespace-nowrap bg-gradient-to-br from-foreground via-foreground/90 to-foreground/70 dark:from-blue-400 dark:via-cyan-400 dark:to-sky-400 bg-clip-text text-transparent">
         , I'm Dere*
       </span>
-      <AnimatePresence>
-        {showAka ? (
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-sm text-muted-foreground ml-2 md:mt-4 w-full text-end"
-          >
-            *(aka Davide)
-          </motion.span>
-        ) : (
-          <div className="text-sm text-muted-foreground/0 ml-2 md:mt-4 w-full text-end">
-            i
-          </div>
-        )}
-      </AnimatePresence>
+      <motion.span
+        animate={{ opacity: showAka ? 1 : 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="text-sm text-muted-foreground ml-2 md:mt-0 w-full text-end min-h-[1.25rem] block opacity-0"
+      >
+        *(aka Davide)
+      </motion.span>
     </div>
   );
 }

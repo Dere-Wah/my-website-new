@@ -33,19 +33,20 @@ export default function About() {
           </p>
 
           <p className="text-lg leading-relaxed italic">
-            You never know what I'll be working on next...
+            I’m bad at intros. Let’s just get that out of the way.
+          </p>
+          <p className="text-lg leading-relaxed pt-20">
+            What I *am* good at is sinking way too much time into overly
+            ambitious side projects that no one asked for and few will ever see.
           </p>
           <p className="text-lg leading-relaxed">
-            One day, I could be crafting a cutting-edge web application; the
-            next, I'm training an AI model for simulation. I might dive into
-            game development, create small indie projects, or build automated
-            content pipelines.
+            To trick myself into finishing things, I started a blog. Writing
+            about my projects while I work on them weirdly keeps me on track.
           </p>
 
           <p className="text-lg leading-relaxed">
-            For me, every project is an adventure, a chance to explore new
-            frontiers in tech. I thrive on the challenge of learning something
-            fresh and love sharing the projects I bring to life.
+            Take a look around—there’s probably something half-finished with a
+            dramatic title waiting for you.
           </p>
         </div>
       </motion.div>

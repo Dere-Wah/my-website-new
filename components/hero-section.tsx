@@ -39,17 +39,15 @@ export default function HeroSection() {
       >
         <motion.h1
           variants={item}
-          className="text-4xl md:text-5xl font-bold tracking-tight mb-6"
+          className="text-4xl md:text-5xl font-bold tracking-tight -mb-4"
         >
           <Greeting />
         </motion.h1>
 
         <motion.div variants={item} className="relative">
-          <motion.p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-            A curious mind exploring the vast world of technology.
-            <br />
-            From crafting web experiences to training AI models, I love turning
-            wild ideas into reality through code.
+          <motion.p className="text-xl md:text-2xl text-muted-foreground mb-10 font-medium italic tracking-wide flex items-center gap-2">
+            <Icon icon="mdi:certificate" className="text-yellow-500 text-2xl" />
+            Certified duct tape engineer
           </motion.p>
         </motion.div>
 
