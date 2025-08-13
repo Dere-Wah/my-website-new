@@ -1,0 +1,360 @@
+---
+title: "Self-Forcing: Making AI Video Generation Endless"
+date: "2025-08-13"
+description: "How experimenting with self-forcing allowed me to push video generation to the next level"
+tags: ["Self-Forcing", "Video Generation", "World Models", "Video2Video"]
+published: false
+thumbnail: "/assets/blog/self-forcing-endless/thumbnail.png"
+---
+import { Shield } from "../components/ui/shield";
+import { SafeVideo } from "../components/safe-video";
+import { Callout } from "../components/ui/callout";
+
+## Introduction
+
+Generative video models have become increasingly common lately, but one innovation in particular caught my attention. Not for how it looks, but for how it works: Self-Forcing.
+
+Self-Forcing isn't a new model, but an architectural approach that changes how video is generated.
+
+Unlike traditional models that generate entire 10-second clips in a single, often sluggish pass, Self-Forcing introduces a different philosophy. It generates video **frame by frame**, using an **autoregressive rollout** and storing its working memory in a **KV (Key/Value) Cache**. This setup not only slashes latency, but enables smooth, real-time video generation.
+
+But Self-Forcing isn’t just a faster pipeline, it's an architectural shift. Instead of training on perfect sequences from the dataset, the model learns to generate sequences while relying on its own previously generated frames, just like it would do at inference time. This clever change, known as self-forcing, closes the gap between training and deployment, making the model more robust, consistent, and efficient.
+
+Rather than diving into the paper directly [(which I still recommend checking out)](https://self-forcing.github.io/), in this post I want to cover some new improvements and experiments we’ve been exploring to push the model even further.
+
+---
+
+## Self-Forcing: Let’s Make It Endless
+
+By default, Self-Forcing only supports fast generation only up to [**81 frames**](https://github.com/guandeh17/Self-Forcing/blob/eb36b56aca91528bf5f1dcf36395e5c7151071e2/configs/default_config.yaml#L20C13-L20C15). This is hardcoded in the codebase, which immediately felt like a limitation. Theoretically, there was no reason this couldn’t be extended… and that’s exactly what I set out to do.
+
+My goal was straightforward: take the existing inference loop, **hack it to "wrap around"**, and allow generation to continue **infinitely**.
+
+![The idea behind all of this](/assets/blog/self-forcing-endless/1.png)
+
+The original paper gave a subtle but important clue: it mentioned that longer generations had been tested, but the quality degraded over time. This was a huge hint. It meant that endless generation was **possible**, even if it came with challenges.
+
+<div className="flex flex-wrap justify-center gap-0.5 -my-24">
+    <SafeVideo
+            src="/assets/blog/self-forcing-endless/2.mp4"
+            className="w-2/5 justify-center aspect-square"
+            autoPlay
+            loop
+            muted
+            playsInline
+        />
+</div>
+
+After a few days of diving into the code, I managed to get it working. The trick? Take the last generated **latent**, reset the model, and kick off a new generation loop using that latent instead of starting from scratch. Skip the first generation step, and boom. Endless video!
+
+What's even better is that the results matched the paper’s findings. After about 30 seconds of continuous generation, things started to fall apart: colors became overly saturated, movement patterns looped unnaturally, and the animation lost its realism.
+
+<div className="flex flex-col md:flex-row justify-center items-center gap-0.5">
+    <SafeVideo
+        src="/assets/blog/self-forcing-endless/3.mp4"
+        className="md:w-1/3 justify-center aspect-square"
+        autoPlay
+        loop
+        muted
+        playsInline
+    />
+    <div>
+        ![Pure nightmare fuel](/assets/blog/self-forcing-endless/4.png)
+    </div>
+    <div>
+        ![Pure nightmare fuel](/assets/blog/self-forcing-endless/5.png)
+    </div>
+</div>
+
+<Callout emoji="💡">
+My results, after getting the model to infinitely generate.  Pure nightmare fuel.
+</Callout>
+
+Another issue I noticed happening inside of the generated videos, was a constant flicker, happening periodically every ~1 second. This flicker was really unnatural and I wanted to fix it, since it didn’t seem to happen in the original paper results.
+
+So next, I set out to fix these 2 issues: the flickering, and the degradation.
+
+---
+
+## Resetting the model… but not its memory
+
+See, as a duct-tape code guy, I went for the easiest solution in the book. I hacked the code to loop around and start over using the previous frame as the new one. However, I missed one crucial point: the model’s VAE uses memory.
+
+Let’s break it down. The model operates in latent space. This means the whole “generation” of new content happens in a format that isn’t plain RGB space. To translate our images into these latents, we use VAEs. And since we’re generating video, Self-Forcing was using a VAE that:
+
+- Compressed multiple frames together into a single latent
+- Used a memory system (a VAE cache) to better convert these latents into human-viewable images and vice versa
+
+<div className="flex flex-row justify-center">
+    <div className="w-1/2">
+        ![The VAE Encoding method, with memory](/assets/blog/self-forcing-endless/6.png)
+    </div>
+</div>
+
+_Special thanks to my cat for agreeing to be squeezed into a latent for this image._
+
+
+(In this case, Self-Forcing was only doing a one-way operation. It was generating new latents, dreaming in a highly compressed space that was still understandable to the AI, and it was doing so with multiple frames stacked inside each latent.)
+
+However, decoding those frames required memory. When I reset the model and restarted the generation without preserving that memory, it directly caused the flickers. Once I changed the process so that, after resetting the model, the VAE’s memory was still kept intact, the flickers disappeared. Even though each run technically started fresh, the preserved memory ensured visual consistency.
+
+---
+
+Now that we had solved these flickers, it was time to move onto actually trying to prevent the model from degrading in quality.
+
+## Fixing the Degradation
+
+The quality degradation stemmed from **error accumulation** in the generated frames. With each new latent, small artifacts (visual and temporal) start to creep in. Over time, these build up:
+
+- **Spatial artifacts**: blurry or distorted visuals.
+- **Temporal artifacts**: repetitive or unnatural motion patterns.
+
+Self-Forcing relies on three key context points for generating each frame:
+
+- The **Condition** (your prompt),
+- The **Memory** (cached latents),
+- The **Current latent** at a specific denoise step.
+
+As more time passes and more frames get generated, latents start to accumulate errors, which end up influencing next frames, which will add even more error to it.
+
+---
+
+## Real-Time Conditioning
+
+My first idea was to **change the prompt on the fly** as the video began to degrade. What if I could shift the condition to something entirely new, or even design it to **counteract the drift**? Even if it didn’t completely solve the problem, adding a way to *steer* the endless video in real time seemed too good not to try.
+
+The implementation was straightforward. During inference, I made it possible to update the prompt instantly, replacing the old condition with a new one in the very next generation cycle.
+
+Technically, it worked. The model responded to changes, and the scene updated in real time. The problem was that while it *did* influence what was happening, the changes were often subtle, more like gentle nudges than dramatic shifts, and it didn’t restore the image quality once degradation had set in. Once the scene had slipped into surreal, oversaturated chaos, no amount of prompt tweaking could fully pull it back.
+
+Still, there was something interesting here. Even though real-time conditioning couldn’t roll back the damage, it hinted at ways the system might stabilize itself... which is exactly what started to happen in the next stage of my experiments.
+
+---
+
+## The Cache Purge Trick
+
+I decided to try something more radical: **purging the model’s memory mid-generation**.
+
+The model’s memory lives in a cache that stores information from previous frames. This is different from the VAE cache mentioned earlier, which only handles the conversion between latent space and RGB space.
+
+- The VAE cache does not generate new frames. It only encodes and decodes, sometimes adding detail during decoding.
+- The model cache, on the other hand, drives frame generation. It combines past latents with new noisy ones to produce consistent outputs. Unfortunately, that same consistency meant it also preserved any accumulated corruption.
+
+Since the corruption seemed to live in the model cache, I added a button to the frontend to **clear it on demand** without stopping generation. This “reset” forced the model to forget everything it had seen.
+
+![Pure nightmare fuel](/assets/blog/self-forcing-endless/6.1.png)
+
+Technically, the purge worked perfectly. The results, however, varied:
+
+- Sometimes there was no visible change, and motion stayed perfectly consistent.
+- Sometimes the scene shifted completely, as if starting from scratch.
+- And sometimes it hit the ideal balance — a refreshed, high-quality frame sequence that still felt coherent.
+
+<div className="flex flex-col md:flex-row items-center -mt-16">
+    <SafeVideo
+        src="/assets/blog/self-forcing-endless/7.mp4"
+        className="md:w-1/2 justify-center aspect-square -mb-24 md:mb-0"
+        autoPlay
+        loop
+        muted
+        playsInline
+    />
+    <SafeVideo
+        src="/assets/blog/self-forcing-endless/8.mp4"
+        className="md:w-1/2 justify-center aspect-square mb-0"
+        autoPlay
+        loop
+        muted
+        playsInline
+    />
+</div>
+
+<Callout emoji="💡">
+Here are some of the best results from the cache purge trick. As you can see, it is both possible to change what is happening in the scene smoothly, (1) and also recover from degradation. (2)
+</Callout>
+
+The method clearly worked, but the unpredictability left me wondering: **why was it so inconsistent?**
+
+---
+
+## Synchronization: The Key Insight
+
+Then one of our team members had a breakthrough thought:
+
+> "Maybe it's a concurrency issue?"
+> 
+
+That was it.
+
+Digging deeper into the code, I realized the generator doesn't produce frames all at once. Instead, each block of video goes through **four sequential denoising steps**:
+
+![The denoising process](/assets/blog/self-forcing-endless/9.png)
+
+1. **Step 0**: Starts with pure noise.
+2. **Step 1**: The first pass of denoising—still chaotic.
+3. **Step 2**: A more refined latent—shapes and motion start to emerge.
+4. **Step 3**: Final pass—clean frame ready for output.
+
+Here’s the problem: the cache purge could happen **at any point** during these steps. And that timing had a huge impact on the result.
+
+- **Purging at Step 0**: The model has no memory of the previous frames. It behaves as if it's generating a brand-new scene from scratch.
+- **Purging at Step 1**: The first denoising step is still influenced by the old cache, but the rest proceed with a clean slate—so there's slight continuity but a major shift.
+- **Purging at Step 2**: Even more of the generation has been shaped by the old memory, so the output remains heavily tied to the past, though some artifacts are cleared.
+- **Purging at Step 3**: Too late. The frame is already fully denoised with the old cache, so the next step starts from a "dirty" latent—almost no visible change.
+
+![Purging halfway through the denoising](/assets/blog/self-forcing-endless/10.png)
+
+This explained everything. The inconsistency wasn’t random—it was just happening because the purge wasn’t **synchronized** with the denoising process.
+
+To fix it, I added a new parameter that let me **control exactly when the cache reset would occur** within the denoising cycle. This gave me precise control over how the model transitioned between states: whether to do a hard cut, a smooth evolution, or a subtle cleanup.
+
+And with that, the cache purge finally became **predictable** and **usable!**
+
+---
+
+## Best Use Cases for Cache Purge
+
+After a *lot* of experimentation, I finally figured out the most effective ways to use the cache purge feature.
+
+The first and simplest use case is when **generation starts to drift**—colors oversaturate, motion becomes unnatural, or details begin to fall apart. In that case, triggering a cache purge helps **recover image quality**, though it comes at the cost of some temporal consistency with the previous frames.
+
+The second, and arguably most powerful, use case is to **perform a purge right after changing the prompt**. This is crucial because even after updating the prompt, the model continues denoising using the previous memory and condition. Without a purge, the new prompt is "blended" with remnants of the old scene.
+
+<div className="flex flex-row justify-center -my-24">
+    <SafeVideo
+        src="/assets/blog/self-forcing-endless/11.mp4"
+        className=" justify-center aspect-square"
+        autoPlay
+        loop
+        muted
+        playsInline
+    />
+</div>
+<Callout emoji="💡">
+For example, if the current scene shows a **cat**, and you suddenly switch the prompt to describe a **woman**, the step timing of the purge determines how fast and clearly the model adapts. The earlier in the denoising process you clear the cache, the more **reactive** the change, because there is more **random** noise not influenced by previous cache.
+</Callout>
+
+---
+
+## Wrapping This Into a Nice Demo
+
+This tool is impressive: a fast, open-source video generator with a lot of control. But once you start using it, you realize it’s **hard** to manage.
+
+Getting good results means **learning to craft prompts well**. You need to guide the subject, control movement, describe transitions, and keep the generation on track. I’ve spent over a month working on this and still feel there’s more to figure out.
+
+Each prompt acts like a **scene**, so when the prompt changes, the video changes. From this, I found two ways to evolve a generation.
+
+---
+
+### 1. Hard Prompt Switch
+
+In this approach, you **completely change the prompt**. Then you let the model, with the help of cache purging and reactivity, handle the transition. This often leads to a trippy, surreal evolution.
+
+Let’s say your first prompt is:
+
+> “A WOMAN WALKING DOWN THE STREET”
+> 
+
+Then, mid-generation, you change it to:
+
+> “A CAT WALKING DOWN THE STREET”
+> 
+
+These prompts have very little in common, so what the model does is start to slowly morph the features of the woman into something cat-like. The transformation can be strange—eyes might shift, limbs may deform—and depending on the cache state and timing of the purge, the transition can take a while. It’s fascinating, but not always clean.
+
+Using **Reactivity**, you can increase how quickly the change happens, but this comes at the cost of **temporal consistency**—the video may jump or lose smoothness.
+
+<div className="flex flex-col md:flex-row justify-center -my-16">
+    <SafeVideo
+        src="/assets/blog/self-forcing-endless/12.mp4"
+        className="md:w-1/2 justify-center aspect-square md:mb-0 -mb-24"
+        autoPlay
+        loop
+        muted
+        playsInline
+    />
+    <SafeVideo
+        src="/assets/blog/self-forcing-endless/13.mp4"
+        className="md:w-1/2 justify-center aspect-square md:mb-0"
+        autoPlay
+        loop
+        muted
+        playsInline
+    />
+</div>
+
+<Callout emoji="💡">
+In these 2 videos strength 0 and strength 1 are demonstrated.
+</Callout>
+
+In these videos, the “strength” value you see, is basically the inverse of the step at which you purge, The earlier you purge, (steps → 0) the stronger the transition is, so strength → 4.
+
+That’s why when looking at these clips, you see small changes. Because the strength is set to low, and is far out into the steps, when the latent is almost completely defined.
+
+---
+
+### 2. Guided Transition
+
+In the second approach, instead of switching prompts abruptly, you **describe the transformation within the prompt** itself.
+
+For example:
+
+- Prompt 1: “A WOMAN WALKING DOWN THE STREET”
+- Prompt 2: “THE WOMAN MORPHS INTO A CAT WALKING DOWN THE STREET”
+
+With this method, the model understands the transition is intentional. The morph happens explicitly. The woman might gradually grow cat ears, her walk may shift, and eventually the scene becomes fully cat-focused. It’s generally smoother, and visually coherent.
+
+However, there’s a drawback: because the model doesn’t have a true long-term memory, it may **loop** the transformation. Even once the woman has fully turned into a cat, the condition still says "morph into a cat"—so it tries to do it again. You end up in an infinite morph cycle where the cat keeps re-morphing.
+
+---
+
+## Extra: Self-Forcing Video2Video
+
+After working with Self-Forcing for about a month, a new idea started brewing in my mind: what if we could use this same system to perform **real-time video-to-video editing**?
+
+Here’s the basic insight: Self-Forcing starts from a **latent noise vector**, then denoises it over multiple steps using the text condition, while also referencing the previous frames stored in the cache.
+
+So what if we could control that initial noise?
+
+Imagine this pipeline:
+
+1. Take a video.
+2. **Encode each frame into latent space.**
+3. **Add noise** to those latents.
+4. Feed them into the Self-Forcing denoising loop, using a **new text prompt**.
+5. Decode the result back into video frames.
+
+The parts marked with * are features that weren’t originally implemented in the Self-Forcing repo—but they’re key to making this work.
+
+![Adding noise to a clean latent](/assets/blog/self-forcing-endless/14.png)
+
+I took a few days away from the main development and went deep into this idea. After a **lot** of iteration, I eventually got a rough prototype working.
+
+<div className="flex flex-col md:flex-row justify-center">
+    <SafeVideo
+        src="/assets/blog/self-forcing-endless/v2v.mp4"
+        className="justify-center"
+        autoPlay
+        loop
+        muted
+        playsInline
+    />
+</div>
+
+You can now feed in an existing video, encode it to latent space, perturb it with noise, give it a new condition, and generate an **edited version** of the original. What’s wild is that it’s already **almost real-time**. With some clever engineering (e.g., using queues to pipe in frames during encoding), the performance is nearly on par with standard Self-Forcing generation.
+
+It still relies on WAN2.1 and could use some polish, but the potential here is huge. I believe this kind of workflow, **live video editing via latent-space manipulation,** is where a lot of the future of AI video tools is heading.
+
+Even Runway’s new model, ALEPH, seems to be doing exactly that!
+
+---
+
+## What's next?
+
+From this project, I've learnt some incredibly valuable lessons that are now helping shape what’s to be built next. I’m super excited about this, and with a couple of other friends I’ve made along the way, I think that I have something extremely unique, different and powerful going on.
+
+If you want to work on real-time interactive video models, we are working on the next stage of this technology. Reach out! We'd love to hear from others passionate about this.
+
+---
+
+Thanks for reading! This was a deep dive into Self-Forcing, endless generation, reactivity, cache purging, and the strange beauty of prompting real-time video with text. There’s so much more to explore, and we’re just getting started.
