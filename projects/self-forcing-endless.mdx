@@ -91,16 +91,17 @@ Let’s break it down. The model operates in latent space. This means the whole 
     </div>
 </div>
 
-_Special thanks to my cat for agreeing to be squeezed into a latent for this image._
-
+<Callout emoji="🐱">
+Special thanks to my cat for agreeing to be squeezed into a latent for this demo.
+</Callout>
 
 (In this case, Self-Forcing was only doing a one-way operation. It was generating new latents, dreaming in a highly compressed space that was still understandable to the AI, and it was doing so with multiple frames stacked inside each latent.)
 
 However, decoding those frames required memory. When I reset the model and restarted the generation without preserving that memory, it directly caused the flickers. Once I changed the process so that, after resetting the model, the VAE’s memory was still kept intact, the flickers disappeared. Even though each run technically started fresh, the preserved memory ensured visual consistency.
 
----
-
 Now that we had solved these flickers, it was time to move onto actually trying to prevent the model from degrading in quality.
+
+---
 
 ## Fixing the Degradation
 
@@ -148,7 +149,7 @@ Technically, the purge worked perfectly. The results, however, varied:
 
 - Sometimes there was no visible change, and motion stayed perfectly consistent.
 - Sometimes the scene shifted completely, as if starting from scratch.
-- And sometimes it hit the ideal balance — a refreshed, high-quality frame sequence that still felt coherent.
+- And sometimes it hit the ideal balance: a refreshed, high-quality frame sequence that still felt coherent.
 
 <div className="flex flex-col md:flex-row items-center -mt-16">
     <SafeVideo
@@ -191,20 +192,20 @@ Digging deeper into the code, I realized the generator doesn't produce frames al
 ![The denoising process](/assets/blog/self-forcing-endless/9.png)
 
 1. **Step 0**: Starts with pure noise.
-2. **Step 1**: The first pass of denoising—still chaotic.
-3. **Step 2**: A more refined latent—shapes and motion start to emerge.
-4. **Step 3**: Final pass—clean frame ready for output.
+2. **Step 1**: The first pass of denoising; still chaotic.
+3. **Step 2**: A more refined latent; shapes and motion start to emerge.
+4. **Step 3**: Final pass; clean frame ready for output.
 
 Here’s the problem: the cache purge could happen **at any point** during these steps. And that timing had a huge impact on the result.
 
 - **Purging at Step 0**: The model has no memory of the previous frames. It behaves as if it's generating a brand-new scene from scratch.
-- **Purging at Step 1**: The first denoising step is still influenced by the old cache, but the rest proceed with a clean slate—so there's slight continuity but a major shift.
+- **Purging at Step 1**: The first denoising step is still influenced by the old cache, but the rest proceed with a clean slate, so there's slight continuity but a major shift.
 - **Purging at Step 2**: Even more of the generation has been shaped by the old memory, so the output remains heavily tied to the past, though some artifacts are cleared.
-- **Purging at Step 3**: Too late. The frame is already fully denoised with the old cache, so the next step starts from a "dirty" latent—almost no visible change.
+- **Purging at Step 3**: Too late. The frame is already fully denoised with the old cache, so the next step starts from a "defined" latent: almost no visible change.
 
 ![Purging halfway through the denoising](/assets/blog/self-forcing-endless/10.png)
 
-This explained everything. The inconsistency wasn’t random—it was just happening because the purge wasn’t **synchronized** with the denoising process.
+This explained everything. The inconsistency wasn’t random! it was just happening because the purge wasn’t **synchronized** with the denoising process.
 
 To fix it, I added a new parameter that let me **control exactly when the cache reset would occur** within the denoising cycle. This gave me precise control over how the model transitioned between states: whether to do a hard cut, a smooth evolution, or a subtle cleanup.
 
@@ -216,7 +217,7 @@ And with that, the cache purge finally became **predictable** and **usable!**
 
 After a *lot* of experimentation, I finally figured out the most effective ways to use the cache purge feature.
 
-The first and simplest use case is when **generation starts to drift**—colors oversaturate, motion becomes unnatural, or details begin to fall apart. In that case, triggering a cache purge helps **recover image quality**, though it comes at the cost of some temporal consistency with the previous frames.
+The first and simplest use case is when **generation starts to drift**. Colors oversaturate, motion becomes unnatural, or details begin to fall apart. In that case, triggering a cache purge helps **recover image quality**, though it comes at the cost of some temporal consistency with the previous frames.
 
 The second, and arguably most powerful, use case is to **perform a purge right after changing the prompt**. This is crucial because even after updating the prompt, the model continues denoising using the previous memory and condition. Without a purge, the new prompt is "blended" with remnants of the old scene.
 
@@ -260,9 +261,9 @@ Then, mid-generation, you change it to:
 > “A CAT WALKING DOWN THE STREET”
 > 
 
-These prompts have very little in common, so what the model does is start to slowly morph the features of the woman into something cat-like. The transformation can be strange—eyes might shift, limbs may deform—and depending on the cache state and timing of the purge, the transition can take a while. It’s fascinating, but not always clean.
+These prompts have very little in common, so what the model does is start to slowly morph the features of the woman into something cat-like. The transformation can be strange: eyes might shift, limbs may deform, and depending on the cache state and timing of the purge, the transition can take a while. It’s fascinating, but not always clean.
 
-Using **Reactivity**, you can increase how quickly the change happens, but this comes at the cost of **temporal consistency**—the video may jump or lose smoothness.
+Using **Reactivity**, you can increase how quickly the change happens, but this comes at the cost of **temporal consistency**: the video may jump or lose smoothness.
 
 <div className="flex flex-col md:flex-row justify-center -my-16">
     <SafeVideo
@@ -304,7 +305,7 @@ For example:
 
 With this method, the model understands the transition is intentional. The morph happens explicitly. The woman might gradually grow cat ears, her walk may shift, and eventually the scene becomes fully cat-focused. It’s generally smoother, and visually coherent.
 
-However, there’s a drawback: because the model doesn’t have a true long-term memory, it may **loop** the transformation. Even once the woman has fully turned into a cat, the condition still says "morph into a cat"—so it tries to do it again. You end up in an infinite morph cycle where the cat keeps re-morphing.
+However, there’s a drawback: because the model doesn’t have a true long-term memory, it may **loop** the transformation. Even once the woman has fully turned into a cat, the condition still says "morph into a cat", so it tries to do it again. You end up in an infinite morph cycle where the cat keeps re-morphing.
 
 ---
 
@@ -324,7 +325,7 @@ Imagine this pipeline:
 4. Feed them into the Self-Forcing denoising loop, using a **new text prompt**.
 5. Decode the result back into video frames.
 
-The parts marked with * are features that weren’t originally implemented in the Self-Forcing repo—but they’re key to making this work.
+The parts marked with * are features that weren’t originally implemented in the Self-Forcing repo, but they’re key to making this work.
 
 ![Adding noise to a clean latent](/assets/blog/self-forcing-endless/14.png)
 

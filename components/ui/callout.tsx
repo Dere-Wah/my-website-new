@@ -10,7 +10,10 @@ interface CalloutProps {
 export function Callout({ emoji = "💡", children, className }: CalloutProps) {
 	return (
 		<div
-			className={cn("my-6 rounded-md bg-muted/40 p-3 text-sm", className)}
+			className={cn(
+				"my-6 rounded-md bg-gray-400/20 p-3 text-sm",
+				className
+			)}
 		>
 			<div className="grid grid-cols-[1.5em,1fr] items-start gap-x-3">
 				<div className="col-[1] row-[1] select-none text-base leading-[1.25]">
