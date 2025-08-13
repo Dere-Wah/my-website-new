@@ -316,12 +316,22 @@ In the second approach, instead of switching prompts abruptly, you **describe th
 
 For example:
 
-- Prompt 1: “A WOMAN WALKING DOWN THE STREET”
-- Prompt 2: “THE WOMAN MORPHS INTO A CAT WALKING DOWN THE STREET”
+- Prompt 1: “A ROCKET IS STANDING ON A LAUNCHING PAD”
+- Prompt 2: “THE ROCKET BEGINS LAUNCH AND SHOOTS IN THE SKY”
 
-With this method, the model understands the transition is intentional. The morph happens explicitly. The woman might gradually grow cat ears, her walk may shift, and eventually the scene becomes fully cat-focused. It’s generally smoother, and visually coherent.
+With this method, the model understands the transition is intentional. The transitions happens explicitly. The model sees the rocket turning on its enginges, lifting in the sky, and beginning to move upwards.
 
-However, there’s a drawback: because the model doesn’t have a true long-term memory, it may **loop** the transformation. Even once the woman has fully turned into a cat, the condition still says "morph into a cat", so it tries to do it again. You end up in an infinite morph cycle where the cat keeps re-morphing.
+However, there’s a drawback: because the model doesn’t have a true long-term memory, it may **loop** the transformation. Even once the rocket has fully launched, the condition still says "THE ROCKET LAUNCHES", so it tries to do it again. You end up in an infinite cycle where the rocket keeps re-launching.
+
+<SafeVideo
+    src="/assets/blog/self-forcing-endless/repeating.mp4"
+    className="justify-center"
+    autoPlay
+    loop
+    muted
+    playsInline
+    controls
+/>
 
 ---
 
