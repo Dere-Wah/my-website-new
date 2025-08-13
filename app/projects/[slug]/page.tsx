@@ -100,7 +100,19 @@ export default async function ProjectPage({
 						</div>
 					</div>
 
-					{frontmatter.thumbnail && (
+					{frontmatter.video_thumbnail && (
+						<div className="relative aspect-video rounded-lg overflow-hidden border">
+							<SafeVideo
+								src={frontmatter.video_thumbnail}
+								autoPlay
+								loop
+								muted
+								playsInline
+							/>
+						</div>
+					)}
+
+					{!frontmatter.video_thumbnail && frontmatter.thumbnail && (
 						<div className="relative aspect-video rounded-lg overflow-hidden border">
 							<Image
 								src={frontmatter.thumbnail}

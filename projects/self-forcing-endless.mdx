@@ -2,25 +2,22 @@
 title: "Self-Forcing: Making AI Video Generation Endless"
 date: "2025-08-13"
 description: "How experimenting with self-forcing allowed me to push video generation to the next level"
-tags: ["Self-Forcing", "Video Generation", "World Models", "Video2Video"]
+tags: ["Self-Forcing", "Video Generation", "World Models", "Open Source"]
 published: false
 thumbnail: "/assets/blog/self-forcing-endless/thumbnail.png"
+video_thumbnail: "/assets/blog/self-forcing-endless/demo.mp4"
 ---
 import { Shield } from "../components/ui/shield";
 import { SafeVideo } from "../components/safe-video";
 import { Callout } from "../components/ui/callout";
 
-## Introduction
+Self-Forcing is not a new model, but an architectural paradigm for autoregressive video diffusion.
 
-Generative video models have become increasingly common lately, but one innovation in particular caught my attention. Not for how it looks, but for how it works: Self-Forcing.
+It trains by simulating inference: the model generates video **frame by frame** with a rolling **KV (Key/Value) cache**, conditioning each frame on its own previously generated outputs rather than ground-truth context. This closes the train-test gap (reduces exposure bias) and enables low-latency, streaming video generation.
 
-Self-Forcing isn't a new model, but an architectural approach that changes how video is generated.
+For background, see the <Shield icon="mdi:web" href="https://self-forcing.github.io/" text="Project Page"></Shield> and <Shield icon="simple-icons:arxiv" href="https://arxiv.org/abs/2506.08009" text="arXiv paper"></Shield>.
 
-Unlike traditional models that generate entire 10-second clips in a single, often sluggish pass, Self-Forcing introduces a different philosophy. It generates video **frame by frame**, using an **autoregressive rollout** and storing its working memory in a **KV (Key/Value) Cache**. This setup not only slashes latency, but enables smooth, real-time video generation.
-
-But Self-Forcing isn’t just a faster pipeline, it's an architectural shift. Instead of training on perfect sequences from the dataset, the model learns to generate sequences while relying on its own previously generated frames, just like it would do at inference time. This clever change, known as self-forcing, closes the gap between training and deployment, making the model more robust, consistent, and efficient.
-
-Rather than diving into the paper directly [(which I still recommend checking out)](https://self-forcing.github.io/), in this post I want to cover some new improvements and experiments we’ve been exploring to push the model even further.
+This post builds on that architecture, and all additions here are open-sourced at the <Shield icon="mdi:github" href="https://github.com/Dere-Wah/Self-Forcing-Endless" text="Self-Forcing-Endless" /> repository.
 
 ---
 
@@ -32,12 +29,16 @@ My goal was straightforward: take the existing inference loop, **hack it to "wra
 
 ![The idea behind all of this](/assets/blog/self-forcing-endless/1.png)
 
+<Callout emoji="💡">
+This scheme only briefly covers the architecture of Self-Forcing. As the BlogPost goes in deeper in the details of the changes I applied, each specific step will be explained and covered more precisely.
+</Callout>
+
 The original paper gave a subtle but important clue: it mentioned that longer generations had been tested, but the quality degraded over time. This was a huge hint. It meant that endless generation was **possible**, even if it came with challenges.
 
-<div className="flex flex-wrap justify-center gap-0.5 -my-24">
+<div className="flex flex-wrap justify-center gap-0.5">
     <SafeVideo
             src="/assets/blog/self-forcing-endless/2.mp4"
-            className="w-2/5 justify-center aspect-square"
+            className="w-2/5 justify-center"
             autoPlay
             loop
             muted
@@ -57,6 +58,7 @@ What's even better is that the results matched the paper’s findings. After abo
         loop
         muted
         playsInline
+        controls
     />
     <div>
         ![Pure nightmare fuel](/assets/blog/self-forcing-endless/4.png)
@@ -83,7 +85,7 @@ See, as a duct-tape code guy, I went for the easiest solution in the book. I hac
 Let’s break it down. The model operates in latent space. This means the whole “generation” of new content happens in a format that isn’t plain RGB space. To translate our images into these latents, we use VAEs. And since we’re generating video, Self-Forcing was using a VAE that:
 
 - Compressed multiple frames together into a single latent
-- Used a memory system (a VAE cache) to better convert these latents into human-viewable images and vice versa
+- Uses a memory system (a VAE cache) to better convert these latents into human-viewable images and vice versa
 
 <div className="flex flex-row justify-center">
     <div className="w-1/2">
@@ -151,22 +153,24 @@ Technically, the purge worked perfectly. The results, however, varied:
 - Sometimes the scene shifted completely, as if starting from scratch.
 - And sometimes it hit the ideal balance: a refreshed, high-quality frame sequence that still felt coherent.
 
-<div className="flex flex-col md:flex-row items-center -mt-16">
+<div className="flex flex-col md:flex-row items-center">
     <SafeVideo
         src="/assets/blog/self-forcing-endless/7.mp4"
-        className="md:w-1/2 justify-center aspect-square -mb-24 md:mb-0"
+        className="md:w-1/2 justify-center"
         autoPlay
         loop
         muted
         playsInline
+        controls
     />
     <SafeVideo
         src="/assets/blog/self-forcing-endless/8.mp4"
-        className="md:w-1/2 justify-center aspect-square mb-0"
+        className="md:w-1/2 justify-center"
         autoPlay
         loop
         muted
         playsInline
+        controls
     />
 </div>
 
@@ -207,7 +211,7 @@ Here’s the problem: the cache purge could happen **at any point** during these
 
 This explained everything. The inconsistency wasn’t random! it was just happening because the purge wasn’t **synchronized** with the denoising process.
 
-To fix it, I added a new parameter that let me **control exactly when the cache reset would occur** within the denoising cycle. This gave me precise control over how the model transitioned between states: whether to do a hard cut, a smooth evolution, or a subtle cleanup.
+To fix it, I added a new parameter that let me **control exactly when the cache reset would occur** within the denoising cycle. This gave me precise control over how the model transitioned between states: whether to do a hard cut, a smooth evolution, or a subtle cleanup. I decided to call this parameter **"Reactivity"**.
 
 And with that, the cache purge finally became **predictable** and **usable!**
 
@@ -221,14 +225,15 @@ The first and simplest use case is when **generation starts to drift**. Colors o
 
 The second, and arguably most powerful, use case is to **perform a purge right after changing the prompt**. This is crucial because even after updating the prompt, the model continues denoising using the previous memory and condition. Without a purge, the new prompt is "blended" with remnants of the old scene.
 
-<div className="flex flex-row justify-center -my-24">
+<div className="flex flex-row justify-center">
     <SafeVideo
         src="/assets/blog/self-forcing-endless/11.mp4"
-        className=" justify-center aspect-square"
+        className=" justify-center"
         autoPlay
         loop
         muted
         playsInline
+        controls
     />
 </div>
 <Callout emoji="💡">
@@ -265,22 +270,24 @@ These prompts have very little in common, so what the model does is start to slo
 
 Using **Reactivity**, you can increase how quickly the change happens, but this comes at the cost of **temporal consistency**: the video may jump or lose smoothness.
 
-<div className="flex flex-col md:flex-row justify-center -my-16">
+<div className="flex flex-col md:flex-row justify-center">
     <SafeVideo
         src="/assets/blog/self-forcing-endless/12.mp4"
-        className="md:w-1/2 justify-center aspect-square md:mb-0 -mb-24"
+        className="md:w-1/2 justify-center"
         autoPlay
         loop
         muted
         playsInline
+        controls
     />
     <SafeVideo
         src="/assets/blog/self-forcing-endless/13.mp4"
-        className="md:w-1/2 justify-center aspect-square md:mb-0"
+        className="md:w-1/2 justify-center"
         autoPlay
         loop
         muted
         playsInline
+        controls
     />
 </div>
 
