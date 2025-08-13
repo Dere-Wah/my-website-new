@@ -97,13 +97,9 @@ In this specific case, Self-Forcing VAE's:
 
 <div className="flex flex-row justify-center">
     <div className="md:w-1/2">
-        ![The VAE Encoding method, with memory](/assets/blog/self-forcing-endless/6.png)
+        ![The VAE Encoding method, with memory](/assets/blog/self-forcing-endless/vae.png)
     </div>
 </div>
-
-<Callout emoji="🐱">
-Special thanks to my cat for agreeing to be squeezed into a latent for this demo.
-</Callout>
 
 The catch? Exactly that memory. When I reset the model and restarted the generation without preserving it, in latent space the frames were fine, but when they were being moved through the VAE, they were missing the context of the previous frames stored in the cache.
 
