@@ -38,15 +38,18 @@ The original paper gave a subtle but important clue: it mentioned that longer ge
 <div className="flex flex-wrap justify-center gap-0.5">
     <SafeVideo
             src="/assets/blog/self-forcing-endless/2.mp4"
-            className="w-2/5 justify-center"
+            className="justify-center"
             autoPlay
             loop
             muted
             playsInline
         />
 </div>
+<Callout emoji="💡">
+The video accumulates errors over time, and these stack up and become more evident as time goes on.
+</Callout>
 
-After a few days of diving into the code, I managed to get it working. The trick? Take the last generated **latent**, reset the model, and kick off a new generation loop using that latent instead of starting from scratch. Skip the first generation step, and boom. Endless video!
+After a few days of diving into the code, I managed to get it working. The trick? Take the last generated **frame**, reset the model, and kick off a new generation loop using that frame instead of starting from scratch. Skip the first generation step, and boom. Endless video!
 
 What's even better is that the results matched the paper’s findings. After about 30 seconds of continuous generation, things started to fall apart: colors became overly saturated, movement patterns looped unnaturally, and the animation lost its realism.
 
@@ -69,7 +72,7 @@ What's even better is that the results matched the paper’s findings. After abo
 </div>
 
 <Callout emoji="💡">
-My results, after getting the model to infinitely generate.  Pure nightmare fuel.
+My results, after getting the model to infinitely generate. Pure nightmare fuel.
 </Callout>
 
 Another issue I noticed happening inside of the generated videos, was a constant flicker, happening periodically every ~1 second. This flicker was really unnatural and I wanted to fix it, since it didn’t seem to happen in the original paper results.
@@ -82,13 +85,18 @@ So next, I set out to fix these 2 issues: the flickering, and the degradation.
 
 See, as a duct-tape code guy, I went for the easiest solution in the book. I hacked the code to loop around and start over using the previous frame as the new one. However, I missed one crucial point: the model’s VAE uses memory.
 
-Let’s break it down. The model operates in latent space. This means the whole “generation” of new content happens in a format that isn’t plain RGB space. To translate our images into these latents, we use VAEs. And since we’re generating video, Self-Forcing was using a VAE that:
+Let’s break it down. The model operates in latent space. This means the whole “generation” of new content happens in a format that isn’t plain RGB space.
 
-- Compressed multiple frames together into a single latent
-- Uses a memory system (a VAE cache) to better convert these latents into human-viewable images and vice versa
+But since this **latent space** is not made for humans, we can't just look at it and appreciate it. We need an intermediate step.
+
+ To translate our images into these latents, we use VAEs. Think of VAEs as the portal to the AI dimension.
+
+In this specific case, Self-Forcing VAE's:
+- Compresses multiple temporally nearby frames together into a single latent
+- Uses a memory system (a VAE cache) to maintain consistency between nearby latents.
 
 <div className="flex flex-row justify-center">
-    <div className="w-1/2">
+    <div className="md:w-1/2">
         ![The VAE Encoding method, with memory](/assets/blog/self-forcing-endless/6.png)
     </div>
 </div>
@@ -97,9 +105,9 @@ Let’s break it down. The model operates in latent space. This means the whole 
 Special thanks to my cat for agreeing to be squeezed into a latent for this demo.
 </Callout>
 
-(In this case, Self-Forcing was only doing a one-way operation. It was generating new latents, dreaming in a highly compressed space that was still understandable to the AI, and it was doing so with multiple frames stacked inside each latent.)
+The catch? Exactly that memory. When I reset the model and restarted the generation without preserving it, in latent space the frames were fine, but when they were being moved through the VAE, they were missing the context of the previous frames stored in the cache.
 
-However, decoding those frames required memory. When I reset the model and restarted the generation without preserving that memory, it directly caused the flickers. Once I changed the process so that, after resetting the model, the VAE’s memory was still kept intact, the flickers disappeared. Even though each run technically started fresh, the preserved memory ensured visual consistency.
+The fix was to directly save this cache to a temporary variable, and after the model reset, simply restore it seamlessly.
 
 Now that we had solved these flickers, it was time to move onto actually trying to prevent the model from degrading in quality.
 
@@ -128,9 +136,14 @@ My first idea was to **change the prompt on the fly** as the video began to degr
 
 The implementation was straightforward. During inference, I made it possible to update the prompt instantly, replacing the old condition with a new one in the very next generation cycle.
 
-Technically, it worked. The model responded to changes, and the scene updated in real time. The problem was that while it *did* influence what was happening, the changes were often subtle, more like gentle nudges than dramatic shifts, and it didn’t restore the image quality once degradation had set in. Once the scene had slipped into surreal, oversaturated chaos, no amount of prompt tweaking could fully pull it back.
+Technically, it worked. The model responded to changes, and the scene updated in real time. However, this didn't help solving the degradation problem. 
 
-Still, there was something interesting here. Even though real-time conditioning couldn’t roll back the damage, it hinted at ways the system might stabilize itself... which is exactly what started to happen in the next stage of my experiments.
+<Callout emoji="💡">
+Even using a prompt as specific as
+> "When the scene looks like a picasso painting, with oversaturated colors and unrealistic shapes, smoothly zoom out of it and bring it back to a realistic style"
+
+ didn't help.
+</Callout>
 
 ---
 
