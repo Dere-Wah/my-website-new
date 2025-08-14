@@ -44,7 +44,11 @@ export async function generateMetadata({
 			url: `https://derewah.dev/projects/${params.slug}`,
 			images: [
 				{
-					url: `https://derewah.dev${project.thumbnail}`,
+					url: project.thumbnail
+						? project.thumbnail.startsWith("/assets/")
+							? `https://derewah.dev${project.thumbnail}`
+							: project.thumbnail
+						: undefined,
 					width: 1200,
 					height: 630,
 					alt: project.title,
@@ -57,7 +61,11 @@ export async function generateMetadata({
 			description: project.description,
 			images: [
 				{
-					url: `${project.thumbnail}`,
+					url: project.thumbnail
+						? project.thumbnail.startsWith("/assets/")
+							? `https://derewah.dev${project.thumbnail}`
+							: project.thumbnail
+						: undefined,
 					width: 1200,
 					height: 630,
 					alt: project.title,
