@@ -56,7 +56,7 @@ What's even better is that the results matched the paper’s findings. After abo
 <div className="flex flex-col md:flex-row justify-center items-center gap-0.5">
     <SafeVideo
         src="/assets/blog/self-forcing-endless/3.mp4"
-        className="md:w-1/3 justify-center aspect-square"
+        className="justify-center"
         autoPlay
         loop
         muted
@@ -253,7 +253,7 @@ For example, if the current scene shows a **cat**, and you suddenly switch the p
 
 ## Wrapping This Into a Nice Demo
 
-This tool is impressive: a fast, open-source video generator with a lot of control. But once you start using it, you realize it’s **hard** to manage.
+This tool seems impressive: a fast, open-source video generator with a lot of control. But once you start using it, you realize it’s **hard** to manage.
 
 Getting good results means **learning to craft prompts well**. You need to guide the subject, control movement, describe transitions, and keep the generation on track. I’ve spent over a month working on this and still feel there’s more to figure out.
 
@@ -275,7 +275,7 @@ Then, mid-generation, you change it to:
 > “A CAT WALKING DOWN THE STREET”
 > 
 
-These prompts have very little in common, so what the model does is start to slowly morph the features of the woman into something cat-like. The transformation can be strange: eyes might shift, limbs may deform, and depending on the cache state and timing of the purge, the transition can take a while. It’s fascinating, but not always clean.
+These prompts have very little in common, so what the model does is start to slowly morph the features of the woman into something cat-like. The transformation can be strange (eyes might shift, limbs may deform), and depending on the cache state and timing of the purge, the transition can take a while. It’s fascinating to watch, but not always clean.
 
 Using **Reactivity**, you can increase how quickly the change happens, but this comes at the cost of **temporal consistency**: the video may jump or lose smoothness.
 
@@ -337,7 +337,7 @@ However, there’s a drawback: because the model doesn’t have a true long-term
 
 ## Extra: Self-Forcing Video2Video
 
-After working with Self-Forcing for about a month, a new idea started brewing in my mind: what if we could use this same system to perform **real-time video-to-video editing**?
+After working with Self-Forcing for about a month, a new idea started brewing in my head: what if we could use this same system to perform **real-time video-to-video editing**?
 
 Here’s the basic insight: Self-Forcing starts from a **latent noise vector**, then denoises it over multiple steps using the text condition, while also referencing the previous frames stored in the cache.
 
