@@ -4,7 +4,7 @@ date: "2024-11-18"
 description: "And how you can train basically anything with this workflow!"
 tags: ["AI", "Workflow"]
 published: true
-thumbnail: "/assets/blog/ai-mariokart/thumbnail1.png"
+thumbnail: "https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/thumbnail1.png?raw=true"
 ---
 import { Shield } from "../components/ui/shield";
 import { SafeVideo } from "../components/safe-video";
@@ -23,7 +23,7 @@ In this post, I’ll guide you through my journey of setting up a neural network
 
 <div className="flex flex-wrap justify-center gap-1">
 	<SafeVideo
-		src="/assets/blog/ai-mariokart/escaping.mp4"
+		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/escaping.mp4?raw=true"
 		className="w-2/5 justify-center aspect-square"
 		autoPlay
 		loop
@@ -31,7 +31,7 @@ In this post, I’ll guide you through my journey of setting up a neural network
 		playsInline
 	/>
 	<SafeVideo
-		src="/assets/blog/ai-mariokart/turn.mp4"
+		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/turn.mp4?raw=true"
 		className="w-2/5 justify-center aspect-square"
 		autoPlay
 		loop
@@ -39,7 +39,7 @@ In this post, I’ll guide you through my journey of setting up a neural network
 		playsInline
 	/>
 	<SafeVideo
-		src="/assets/blog/ai-mariokart/tunnel.mp4"
+		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/tunnel.mp4?raw=true"
 		className="w-2/5 justify-center aspect-square"
 		autoPlay
 		loop
@@ -67,7 +67,7 @@ I came across **DIAMOND**, a model trained on games like **ATARI** and **CSGO**,
 
 This blog post will walk you through my process of training the model, the challenges I faced, and the technical lessons learned. A future YouTube video will document this approach applied to another game, so stay tuned!
 
-![The original model trained on CSGO.](/assets/blog/ai-mariokart/csgo.gif)
+![The original model trained on CSGO.](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/csgo.gif?raw=true)
 
 ---
 
@@ -93,7 +93,7 @@ Since no pre-existing SM64 dataset was available, I built a simple program to re
 - **Insufficient Data**: Initial tests with just a few minutes of gameplay led to poor results.  
    *(Check out the preliminary output: [**`YouTube link`**](https://youtu.be/2GYaArkV3Ig)).*
 
-![The first version of AISM64.](/assets/blog/ai-mariokart/sm64ai.gif)
+![The first version of AISM64.](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/sm64ai.gif?raw=true)
 
 This made it clear that training a robust NN for SM64 required either a team effort or a much larger dataset.
 
@@ -197,7 +197,7 @@ For example:
 - A steering value of `0.0` maps to: `[0, ..., 1, ..., 0]` (center position).
 - A steering value of `1.0` maps to: `[0, ..., 0, 1]`.
 
-![The dataset collection script (this is from when it was collecting SM64, so just 11 inputs instead of 20)](/assets/blog/ai-mariokart/vectors_dataset.png)
+![The dataset collection script (this is from when it was collecting SM64, so just 11 inputs instead of 20)](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/vectors_dataset.png?raw=true)
 
 ---
 
@@ -242,7 +242,7 @@ def capture_frame(prediction, img):
 - **Image Processing**: Converts gameplay frames to the required format (removing the alpha channel and resizing).
 - **Data Storage**: Saves both image data (`X`) and steering input vectors (`Y`) for each frame.
 
-![How a dataset looks like from the outside](/assets/blog/ai-mariokart/dataset_hdf5.png)
+![How a dataset looks like from the outside](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/dataset_hdf5.png?raw=true)
 
 ---
 
@@ -272,7 +272,7 @@ These limitations highlight the importance of carefully curating datasets to cov
 
 <div className="flex flex-wrap justify-center gap-1">
 	<SafeVideo
-		src="/assets/blog/ai-mariokart/flicker.mp4"
+		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/flicker.mp4?raw=true"
 		className="w-2/5 justify-center aspect-square"
 		autoPlay
 		loop
@@ -280,7 +280,7 @@ These limitations highlight the importance of carefully curating datasets to cov
 		playsInline
 	/>
 	<SafeVideo
-		src="/assets/blog/ai-mariokart/wallhit.mp4"
+		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/wallhit.mp4?raw=true"
 		className="w-2/5 justify-center aspect-square"
 		autoPlay
 		loop
@@ -316,7 +316,7 @@ DIAMOND’s training framework requires data preprocessing to convert the raw HD
 3. **Output Directory**:
    - Update paths to save processed datasets in the correct locations.
 
-![Processing the tar files](/assets/blog/ai-mariokart/processing_tar_files.png)
+![Processing the tar files](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/processing_tar_files.png?raw=true)
 
 ---
 
@@ -386,7 +386,7 @@ The PyTorch website ([**`pytorch.org`**](https://pytorch.org/)) provides an inte
 
 Training DIAMOND for Mario Kart 64 required careful optimization of batch sizes and gradient accumulation steps to avoid GPU memory overload while maximizing efficiency. Below is a detailed explanation of the chosen parameters and reasoning based on your setup and experimentation:
 
-![Adjusting to fill the GPU on colab](/assets/blog/ai-mariokart/filling_gpu.png)
+![Adjusting to fill the GPU on colab](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/filling_gpu.png?raw=true)
 
 ---
 
@@ -471,7 +471,7 @@ To start training, I ran the modified `main.py` with the optimized parameters. M
 
 ## **Training Outputs**
 
-![Outputs](/assets/blog/ai-mariokart/checkpoints.png)
+![Outputs](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/checkpoints.png?raw=true)
 
 Upon training completion (or interruption), DIAMOND saves results in the `outputs` directory. Key files include:
 
@@ -491,7 +491,7 @@ The NN needs "spawns" to initialize the simulation. Spawns are essentially preco
 
 ## **Structure of Spawns**
 
-![Adjusting to fill the GPU on colab](/assets/blog/ai-mariokart/spawn.png)
+![Adjusting to fill the GPU on colab](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/spawn.png?raw=true)
 
 In the **CSGO DIAMOND model** uploaded to HuggingFace ([**`here`**](https://huggingface.co/eloialonso/diamond/tree/main/csgo)), you can find a `spawn` folder. Inside it, there are numbered folders with `.npy` files and an `info.json` file. The `.npy` files contain the data needed for initialization:
 
