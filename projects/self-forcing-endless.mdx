@@ -11,9 +11,9 @@ import { Shield } from "../components/ui/shield";
 import { SafeVideo } from "../components/safe-video";
 import { Callout } from "../components/ui/callout";
 
-Self-Forcing is not a new model, but an architectural paradigm for autoregressive video diffusion.
+Generative video models have advanced rapidly in recent years, and among the many approaches, one stands out for how it works rather than how it looks: Self-Forcing.
 
-It trains by simulating inference: the model generates video **frame by frame** with a rolling **KV (Key/Value) cache**, conditioning each frame on its own previously generated outputs rather than ground-truth context. This closes the train-test gap (reduces exposure bias) and enables low-latency, streaming video generation.
+Rather than introducing a new model, Self-Forcing is an architectural paradigm for autoregressive video diffusion. It trains by simulating inference, generating video frame by frame with a rolling KV (Key/Value) cache and conditioning each frame on its own previously produced outputs instead of ground-truth context. This approach narrows the train-test gap, reduces exposure bias, and enables low-latency, streaming video generation.
 
 For background, see the <Shield icon="mdi:web" href="https://self-forcing.github.io/" text="Project Page"></Shield> and <Shield icon="simple-icons:arxiv" href="https://arxiv.org/abs/2506.08009" text="arXiv paper"></Shield>.
 
