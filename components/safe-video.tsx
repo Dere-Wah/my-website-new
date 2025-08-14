@@ -47,42 +47,30 @@ const SafeVideo: React.FC<SafeVideoProps> = ({
 			}
 		};
 	}, []);
+	// Auto-retry logic for any video error
+	const handleVideoError = useCallback(() => {
+		if (retryCount < 5) {
+			setIsRetrying(true);
+			const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s, etc.
 
-	// Auto-retry logic for 429 errors
-	const handleVideoError = useCallback(
-		(event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-			const videoElement = event.currentTarget;
-			const error = videoElement.error;
-
-			// Check if it's a network error that might be a 429
-			if (
-				error &&
-				error.code === MediaError.MEDIA_ERR_NETWORK &&
-				retryCount < 5
-			) {
-				setIsRetrying(true);
-				const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 1s, 2s, 4s, 8s, 16s
-
-				retryTimeoutRef.current = setTimeout(() => {
-					setRetryCount((prev) => prev + 1);
-					setIsRetrying(false);
-					setIsError(false);
-
-					// Force reload the video by updating the src
-					if (videoRef.current) {
-						const currentSrc = videoRef.current.src;
-						videoRef.current.src = "";
-						videoRef.current.src = currentSrc;
-						videoRef.current.load();
-					}
-				}, delay);
-			} else {
-				setIsError(true);
+			retryTimeoutRef.current = setTimeout(() => {
+				setRetryCount((prev) => prev + 1);
 				setIsRetrying(false);
-			}
-		},
-		[retryCount]
-	);
+				setIsError(false);
+
+				// Force reload the video
+				if (videoRef.current) {
+					const currentSrc = videoRef.current.src;
+					videoRef.current.src = "";
+					videoRef.current.src = currentSrc;
+					videoRef.current.load();
+				}
+			}, delay);
+		} else {
+			setIsError(true);
+			setIsRetrying(false);
+		}
+	}, [retryCount]);
 
 	// Manual retry function
 	const handleManualRetry = useCallback(() => {
