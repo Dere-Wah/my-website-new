@@ -200,29 +200,22 @@ Then one of our team members had a breakthrough thought:
 
 That was it.
 
-Digging deeper into the code, I realized the generator doesn't produce frames all at once. Instead, each block of video goes through **four sequential denoising steps**:
+The generator doesn’t spit out a frame instantly. Each block goes through four sequential denoising passes. At the start, the latent is nothing but random noise. Each pass targets a specific noise timestep, and that timestep decides which parts of the image get changed.
+
+In the early passes, the noise is strong and affects the broad strokes: the overall shapes, layout, and motion in the scene. Later passes target finer details: textures, small motions, and subtle transitions. Think of it like sculpting: first you rough out the block of marble, then you refine the contours, then you polish.
+
+This process is guided by the KV cache (keys and values in the model’s attention layers). The cache is the model’s “memory”: it stores the features of past frames so the next block can stay consistent with what came before. Without it, the model would start from scratch each time.
+
 
 ![The denoising process](/assets/blog/self-forcing-endless/9.png)
 
-1. **Step 0**: Starts with pure noise.
-2. **Step 1**: The first pass of denoising; still chaotic.
-3. **Step 2**: A more refined latent; shapes and motion start to emerge.
-4. **Step 3**: Final pass; clean frame ready for output.
-
-Here’s the problem: the cache purge could happen **at any point** during these steps. And that timing had a huge impact on the result.
-
-- **Purging at Step 0**: The model has no memory of the previous frames. It behaves as if it's generating a brand-new scene from scratch.
-- **Purging at Step 1**: The first denoising step is still influenced by the old cache, but the rest proceed with a clean slate, so there's slight continuity but a major shift.
-- **Purging at Step 2**: Even more of the generation has been shaped by the old memory, so the output remains heavily tied to the past, though some artifacts are cleared.
-- **Purging at Step 3**: Too late. The frame is already fully denoised with the old cache, so the next step starts from a "defined" latent: almost no visible change.
+Here’s the twist: if we purge the KV cache mid-cycle, we’re yanking the rug out from under the model. The current step keeps going, but its link to the past is suddenly gone. Whether that causes a drastic shift or barely any change depends on when during the denoising steps the purge happens. Early purges replace the model’s guiding memory with new, noisy features, while late purges keep the old memory almost intact.
 
 ![Purging halfway through the denoising](/assets/blog/self-forcing-endless/10.png)
 
-This explained everything. The inconsistency wasn’t random! it was just happening because the purge wasn’t **synchronized** with the denoising process.
+![What happens at each denoising timestep](/assets/blog/self-forcing-endless/table.png)
 
-To fix it, I added a new parameter that let me **control exactly when the cache reset would occur** within the denoising cycle. This gave me precise control over how the model transitioned between states: whether to do a hard cut, a smooth evolution, or a subtle cleanup. I decided to call this parameter **"Reactivity"**.
-
-And with that, the cache purge finally became **predictable** and **usable!**
+Once I saw this, the fix was obvious: add a parameter to choose exactly when the purge happens. In the demo I called it **Reactivity**, it lets me pick between a hard cut, a smooth evolution, or a subtle cleanup. Now the purge is predictable, and I can shape transitions however I want.
 
 ---
 
