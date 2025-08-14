@@ -27,7 +27,7 @@ By default, Self-Forcing only supports fast generation only up to [**81 frames**
 
 My goal was straightforward: take the existing inference loop, **hack it to "wrap around"**, and allow generation to continue **infinitely**.
 
-![The idea behind all of this](/assets/blog/self-forcing-endless/1.png)
+![The idea behind all of this](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/1.png?raw=true)
 
 <Callout emoji="💡">
 This scheme only briefly covers the architecture of Self-Forcing. As the BlogPost goes in deeper in the details of the changes I applied, each specific step will be explained and covered more precisely.
@@ -37,7 +37,7 @@ The original paper gave a subtle but important clue: it mentioned that longer ge
 
 <div className="flex flex-wrap justify-center gap-0.5">
     <SafeVideo
-            src="/assets/blog/self-forcing-endless/2.mp4"
+            src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/2.mp4?raw=true"
             className="justify-center"
             autoPlay
             loop
@@ -55,7 +55,7 @@ What's even better is that the results matched the paper’s findings. After abo
 
 <div className="flex flex-col md:flex-row justify-center items-center gap-0.5">
     <SafeVideo
-        src="/assets/blog/self-forcing-endless/3.mp4"
+        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/3.mp4?raw=true"
         className="justify-center"
         autoPlay
         loop
@@ -64,10 +64,10 @@ What's even better is that the results matched the paper’s findings. After abo
         controls
     />
     <div>
-        ![Pure nightmare fuel](/assets/blog/self-forcing-endless/4.png)
+        ![Pure nightmare fuel](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/4.png?raw=true)
     </div>
     <div>
-        ![Pure nightmare fuel](/assets/blog/self-forcing-endless/5.png)
+        ![Pure nightmare fuel](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/5.png?raw=true)
     </div>
 </div>
 
@@ -97,7 +97,7 @@ In this specific case, Self-Forcing VAE's:
 
 <div className="flex flex-row justify-center">
     <div className="md:w-1/2">
-        ![The VAE Encoding method, with memory](/assets/blog/self-forcing-endless/vae.png)
+        ![The VAE Encoding method, with memory](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/vae.png?raw=true)
     </div>
 </div>
 
@@ -154,7 +154,7 @@ The model’s memory lives in a cache that stores information from previous fram
 
 Since the corruption seemed to live in the model cache, I added a button to the frontend to **clear it on demand** without stopping generation. This “reset” forced the model to forget everything it had seen.
 
-![Pure nightmare fuel](/assets/blog/self-forcing-endless/6.1.png)
+![Pure nightmare fuel](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/6.1.png?raw=true)
 
 Technically, the purge worked perfectly. The results, however, varied:
 
@@ -164,7 +164,7 @@ Technically, the purge worked perfectly. The results, however, varied:
 
 <div className="flex flex-col md:flex-row items-center">
     <SafeVideo
-        src="/assets/blog/self-forcing-endless/7.mp4"
+        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/7.mp4?raw=true"
         className="md:w-1/2 justify-center"
         autoPlay
         loop
@@ -173,7 +173,7 @@ Technically, the purge worked perfectly. The results, however, varied:
         controls
     />
     <SafeVideo
-        src="/assets/blog/self-forcing-endless/8.mp4"
+        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/8.mp4?raw=true"
         className="md:w-1/2 justify-center"
         autoPlay
         loop
@@ -207,13 +207,13 @@ In the early passes, the noise is strong and affects the broad strokes: the over
 This process is guided by the KV cache (keys and values in the model’s attention layers). The cache is the model’s “memory”: it stores the features of past frames so the next block can stay consistent with what came before. Without it, the model would start from scratch each time.
 
 
-![The denoising process](/assets/blog/self-forcing-endless/9.png)
+![The denoising process](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/9.png?raw=true)
 
 Here’s the twist: if we purge the KV cache mid-cycle, we’re yanking the rug out from under the model. The current step keeps going, but its link to the past is suddenly gone. Whether that causes a drastic shift or barely any change depends on when during the denoising steps the purge happens. Early purges replace the model’s guiding memory with new, noisy features, while late purges keep the old memory almost intact.
 
-![Purging halfway through the denoising](/assets/blog/self-forcing-endless/10.png)
+![Purging halfway through the denoising](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/10.png?raw=true)
 
-![What happens at each denoising timestep](/assets/blog/self-forcing-endless/table.png)
+![What happens at each denoising timestep](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/table.png?raw=true)
 
 Once I saw this, the fix was obvious: add a parameter to choose exactly when the purge happens. In the demo I called it **Reactivity**, it lets me pick between a hard cut, a smooth evolution, or a subtle cleanup. Now the purge is predictable, and I can shape transitions however I want.
 
@@ -229,7 +229,7 @@ The second, and arguably most powerful, use case is to **perform a purge right a
 
 <div className="flex flex-row justify-center">
     <SafeVideo
-        src="/assets/blog/self-forcing-endless/11.mp4"
+        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/11.mp4?raw=true"
         className=" justify-center"
         autoPlay
         loop
@@ -274,7 +274,7 @@ Using **Reactivity**, you can increase how quickly the change happens, but this 
 
 <div className="flex flex-col md:flex-row justify-center">
     <SafeVideo
-        src="/assets/blog/self-forcing-endless/12.mp4"
+        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/12.mp4?raw=true"
         className="md:w-1/2 justify-center"
         autoPlay
         loop
@@ -283,7 +283,7 @@ Using **Reactivity**, you can increase how quickly the change happens, but this 
         controls
     />
     <SafeVideo
-        src="/assets/blog/self-forcing-endless/13.mp4"
+        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/13.mp4?raw=true"
         className="md:w-1/2 justify-center"
         autoPlay
         loop
@@ -317,7 +317,7 @@ With this method, the model understands the transition is intentional. The trans
 However, there’s a drawback: because the model doesn’t have a true long-term memory, it may **loop** the transformation. Even once the rocket has fully launched, the condition still says "THE ROCKET LAUNCHES", so it tries to do it again. You end up in an infinite cycle where the rocket keeps re-launching.
 
 <SafeVideo
-    src="/assets/blog/self-forcing-endless/repeating.mp4"
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/repeating.mp4?raw=true"
     className="justify-center"
     autoPlay
     loop
@@ -346,13 +346,13 @@ Imagine this pipeline:
 
 The parts marked with * are features that weren’t originally implemented in the Self-Forcing repo, but they’re key to making this work.
 
-![Adding noise to a clean latent](/assets/blog/self-forcing-endless/14.png)
+![Adding noise to a clean latent](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/14.png?raw=true)
 
 I took a few days away from the main development and went deep into this idea. After a **lot** of iteration, I eventually got a rough prototype working.
 
 <div className="flex flex-col md:flex-row justify-center">
     <SafeVideo
-        src="/assets/blog/self-forcing-endless/v2v.mp4"
+        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/v2v.mp4?raw=true"
         className="justify-center"
         autoPlay
         loop
