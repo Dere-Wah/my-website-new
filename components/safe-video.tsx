@@ -19,6 +19,8 @@ const SafeVideo: React.FC<SafeVideoProps> = ({
 }) => {
 	const [isClient, setIsClient] = useState(false);
 	const [isError, setIsError] = useState(false);
+	const [isRetrying, setIsRetrying] = useState(false);
+	const [retryCount, setRetryCount] = useState(0);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState(0);
@@ -28,9 +30,76 @@ const SafeVideo: React.FC<SafeVideoProps> = ({
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const hideControlsTimeoutRef = useRef<NodeJS.Timeout>();
+	const retryTimeoutRef = useRef<NodeJS.Timeout>();
 
 	useEffect(() => {
 		setIsClient(true);
+	}, []);
+
+	// Cleanup timeouts on unmount
+	useEffect(() => {
+		return () => {
+			if (hideControlsTimeoutRef.current) {
+				clearTimeout(hideControlsTimeoutRef.current);
+			}
+			if (retryTimeoutRef.current) {
+				clearTimeout(retryTimeoutRef.current);
+			}
+		};
+	}, []);
+
+	// Auto-retry logic for 429 errors
+	const handleVideoError = useCallback(
+		(event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+			const videoElement = event.currentTarget;
+			const error = videoElement.error;
+
+			// Check if it's a network error that might be a 429
+			if (
+				error &&
+				error.code === MediaError.MEDIA_ERR_NETWORK &&
+				retryCount < 5
+			) {
+				setIsRetrying(true);
+				const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+
+				retryTimeoutRef.current = setTimeout(() => {
+					setRetryCount((prev) => prev + 1);
+					setIsRetrying(false);
+					setIsError(false);
+
+					// Force reload the video by updating the src
+					if (videoRef.current) {
+						const currentSrc = videoRef.current.src;
+						videoRef.current.src = "";
+						videoRef.current.src = currentSrc;
+						videoRef.current.load();
+					}
+				}, delay);
+			} else {
+				setIsError(true);
+				setIsRetrying(false);
+			}
+		},
+		[retryCount]
+	);
+
+	// Manual retry function
+	const handleManualRetry = useCallback(() => {
+		setIsError(false);
+		setIsRetrying(true);
+		setRetryCount(0);
+
+		if (videoRef.current) {
+			const currentSrc = videoRef.current.src;
+			videoRef.current.src = "";
+			videoRef.current.src = currentSrc;
+			videoRef.current.load();
+		}
+
+		setTimeout(() => {
+			setIsRetrying(false);
+		}, 1000);
 	}, []);
 
 	// Handle fullscreen change events
@@ -133,12 +202,81 @@ const SafeVideo: React.FC<SafeVideoProps> = ({
 	// Calculate progress percentage
 	const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
 
-	if (!isClient || isError) {
+	if (!isClient) {
 		return (
 			<div
-				className={`bg-gray-200 flex items-center justify-center text-sm text-gray-500 ${className}`}
+				className={`bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-sm text-gray-500 aspect-square ${className}`}
 			>
-				Video failed to load
+				Loading...
+			</div>
+		);
+	}
+
+	if (isError || isRetrying) {
+		return (
+			<div
+				className={`bg-gray-200 dark:bg-gray-800 flex flex-col items-center justify-center text-sm text-gray-500 dark:text-gray-400 aspect-square p-4 ${className}`}
+			>
+				{isRetrying ? (
+					<>
+						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500 mb-3"></div>
+						<div className="text-center">
+							<p>Retrying...</p>
+							<p className="text-xs mt-1">
+								Attempt {retryCount + 1}/5
+							</p>
+						</div>
+					</>
+				) : (
+					<>
+						<div className="text-center mb-4">
+							<svg
+								className="w-12 h-12 mx-auto mb-2 text-gray-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+								/>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+							<p className="font-medium">Video failed to load</p>
+							{retryCount > 0 && (
+								<p className="text-xs mt-1">
+									Failed after {retryCount} retries
+								</p>
+							)}
+						</div>
+						<button
+							onClick={handleManualRetry}
+							className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-md transition-colors duration-200 flex items-center gap-2"
+						>
+							<svg
+								className="w-4 h-4"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+								/>
+							</svg>
+							Retry
+						</button>
+					</>
+				)}
 			</div>
 		);
 	}
@@ -157,7 +295,7 @@ const SafeVideo: React.FC<SafeVideoProps> = ({
 				ref={videoRef}
 				className="w-full h-full"
 				poster={poster}
-				onError={() => setIsError(true)}
+				onError={handleVideoError}
 				onTimeUpdate={handleTimeUpdate}
 				onLoadedMetadata={handleLoadedMetadata}
 				onPlay={handlePlay}
