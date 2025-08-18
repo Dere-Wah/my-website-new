@@ -19,7 +19,7 @@ const socialLinks = [
 	},
 	{
 		href: "https://www.x.com/derewah",
-		icon: "lucide:twitter",
+		icon: "fa6-brands:square-x-twitter",
 		label: "Twitter",
 	},
 ];
