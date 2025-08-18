@@ -244,13 +244,11 @@ For example, if the current scene shows a **cat**, and you suddenly switch the p
 
 ---
 
-## Wrapping This Into a Nice Demo
+## Steering the Generation
 
 This tool seems impressive: a fast, open-source video generator with a lot of control. But once you start using it, you realize it’s **hard** to manage.
 
-Getting good results means **learning to craft prompts well**. You need to guide the subject, control movement, describe transitions, and keep the generation on track. I’ve spent over a month working on this and still feel there’s more to figure out.
-
-Each prompt acts like a **scene**, so when the prompt changes, the video changes. From this, I found two ways to evolve a generation.
+I've spent over a month working on this, trying to find the best way to control what's happening on screen, and in the next section I'll share some of my findings.
 
 ---
 
@@ -339,12 +337,12 @@ So what if we could control that initial noise?
 Imagine this pipeline:
 
 1. Take a video.
-2. **Encode each frame into latent space.**
-3. **Add noise** to those latents.
+2. **Encode each frame into latent space.** (*)
+3. **Add noise** to those latents. (*)
 4. Feed them into the Self-Forcing denoising loop, using a **new text prompt**.
 5. Decode the result back into video frames.
 
-The parts marked with * are features that weren’t originally implemented in the Self-Forcing repo, but they’re key to making this work.
+The parts marked with (*) are features that weren’t originally implemented in the Self-Forcing repo, and I had to implement them myself.
 
 ![Adding noise to a clean latent](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/14.png?raw=true)
 
