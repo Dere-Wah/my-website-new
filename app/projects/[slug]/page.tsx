@@ -194,7 +194,7 @@ export default async function ProjectPage({
 					asChild
 					variant="outline"
 					size="sm"
-					className="gap-2 -ml-2 transition-all duration-300 hover:gap-3 text-sm"
+					className="gap-2 -ml-2 transition-all duration-300 hover:gap-3 text-sm mt-4"
 				>
 					<Link href={`../#`}>
 						<ArrowLeftIcon className="h-3.5 w-3.5" /> Back
