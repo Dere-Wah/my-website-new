@@ -116,6 +116,7 @@ export default async function ProjectPage({
 								loop
 								muted
 								playsInline
+								className={`${frontmatter.video_thumbnail_className}`}
 							/>
 						</div>
 					)}
@@ -151,7 +152,7 @@ export default async function ProjectPage({
 					)}
 				</header>
 
-				<Separator className="my-8" />
+				<Separator/>
 
 				<div
 					className={cn(
