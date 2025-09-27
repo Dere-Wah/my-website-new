@@ -5,8 +5,9 @@ description: "Can you complete a lap without drifting outside of context?"
 tags: ["Live Demo"]
 published: false
 video_thumbnail: "https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/escaping.mp4?raw=true"
-video_thumbnail_className: "-my-24"
+video_thumbnail_className: "-my-24 md:-my-56"
 ---
+
 import { Shield } from "../components/ui/shield";
 import { SafeVideo } from "../components/safe-video";
 
@@ -18,31 +19,50 @@ The game is controlled with just 4 keys.
 
 <div className="not-prose grid grid-cols-2 md:grid-cols-4 gap-4 my-8 max-w-2xl mx-auto">
   <div className="flex flex-col items-center space-y-2 p-4 bg-muted rounded-lg">
-    <img src="/assets/blog/ai-mk-fdotinc/a.png" alt="A key" className="w-16 h-16 object-contain" />
+    <img
+      src="/assets/blog/ai-mk-fdotinc/a.png"
+      alt="A key"
+      className="w-16 h-16 object-contain"
+    />
     <span className="text-sm font-medium text-center">Steer Left</span>
   </div>
   <div className="flex flex-col items-center space-y-2 p-4 bg-muted rounded-lg">
-    <img src="/assets/blog/ai-mk-fdotinc/d.png" alt="D key" className="w-16 h-16 object-contain" />
+    <img
+      src="/assets/blog/ai-mk-fdotinc/d.png"
+      alt="D key"
+      className="w-16 h-16 object-contain"
+    />
     <span className="text-sm font-medium text-center">Steer Right</span>
   </div>
   <div className="flex flex-col items-center space-y-2 p-4 bg-muted rounded-lg">
-    <img src="/assets/blog/ai-mk-fdotinc/r.png" alt="R key" className="w-16 h-16 object-contain" />
+    <img
+      src="/assets/blog/ai-mk-fdotinc/r.png"
+      alt="R key"
+      className="w-16 h-16 object-contain"
+    />
     <span className="text-sm font-medium text-center">Reset</span>
   </div>
   <div className="flex flex-col items-center space-y-2 p-4 bg-muted rounded-lg">
-    <img src="/assets/blog/ai-mk-fdotinc/f.png" alt="F key" className="w-16 h-16 object-contain" />
-    <span className="text-sm font-medium text-center">Boost<br/><span className="text-xs text-muted-foreground">(hold down!)</span></span>
+    <img
+      src="/assets/blog/ai-mk-fdotinc/f.png"
+      alt="F key"
+      className="w-16 h-16 object-contain"
+    />
+    <span className="text-sm font-medium text-center">
+      Boost
+      <br />
+      <span className="text-xs text-muted-foreground">(hold down!)</span>
+    </span>
   </div>
 </div>
 
 ## The Goal: Complete a Lap Without Breaking Reality
 
-Your mission is simple but challenging: **complete one full lap around the track**. 
+Your mission is simple but challenging: **complete one full lap around the track**.
 
 Here's the catch: the AI only knows what it has seen before. If you steer too wildly or end up in unfamiliar territory, the model starts to lose track of reality. The world begins to blur and warp like a dream, and you might find yourself teleported to completely different parts of the track... or even off it entirely!
 
 Stay smooth, stay in context, and see if you can make it to the finish line.
-
 
 Feel free to read the full technicals behind this project at this <Shield 
   icon="mdi:book-open-page-variant" 
@@ -51,14 +71,14 @@ Feel free to read the full technicals behind this project at this <Shield
 />
 
 <div className="not-prose flex flex-wrap justify-center gap-1">
-	<SafeVideo
-		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/tunnel.mp4?raw=true"
-		className="md:w-2/5 justify-center aspect-square"
-		autoPlay
-		loop
-		muted
-		playsInline
-	/>
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/tunnel.mp4?raw=true"
+    className="md:w-2/5 justify-center aspect-square"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
 </div>
 ---
 
@@ -67,21 +87,25 @@ Feel free to read the full technicals behind this project at this <Shield
 Here are some fascinating behaviors you'll notice while playing:
 
 ### 🌀 **Infinite Turns**
-Sometimes when you're turning, the AI gets stuck in a loop. Each new frame looks so similar to the last that the model thinks the turn never ends! The track just keeps curving forever. 
+
+Sometimes when you're turning, the AI gets stuck in a loop. Each new frame looks so similar to the last that the model thinks the turn never ends! The track just keeps curving forever.
 
 **Pro tip**: Add some variation to break the loop, alternate between slight left and right movements, or try the reset button.
 
 ### 🚇 **The Endless Tunnel**
+
 The tunnel section is a repeating pattern, which makes it easy for the AI to just... never show you the exit. You might drive through the same tunnel segments infinitely.
 
 **Escape strategy**: Similar to turns: add some steering variation to break the pattern.
 
 ### 🔄 **Time Travel**
-Here's a wild one: the section after the tunnel looks very similar to the track's starting area. Sometimes the AI gets confused and teleports you back to the beginning, even when you're almost at the finish line! 
+
+Here's a wild one: the section after the tunnel looks very similar to the track's starting area. Sometimes the AI gets confused and teleports you back to the beginning, even when you're almost at the finish line!
 
 It's like the neural network is having déjà vu.
 
 ### 🍄 **Boost Mechanics**
+
 The model learned that boost only works when you have a mushroom power-up (look for the icon at the top of the screen). Try using boost when you have one—and remember to **hold the F key down** so the AI can process the boost animation across multiple frames.
 
 **Bonus**: Sometimes hitting reset will start you from a frame where you already have boost available!
@@ -91,11 +115,25 @@ The model learned that boost only works when you have a mushroom power-up (look 
 ## About Me
 
 <div className="not-prose flex items-center gap-4 mb-6">
-  <img src="/assets/blog/ai-mk-fdotinc/davide.jpeg" alt="Davide" className="w-20 h-20 rounded-full object-cover" />
+  <img
+    src="/assets/blog/ai-mk-fdotinc/davide.jpeg"
+    alt="Davide"
+    className="w-20 h-20 rounded-full object-cover"
+  />
   <div>
     <p className="text-lg font-medium">Hey! I'm Davide</p>
-    <p className="text-muted-foreground">22, 🇮🇹, BSc Computer Engineering @ PoliMi</p>
-    <p className="text-muted-foreground">Currently in San Francisco</p>
+    <p className="text-muted-foreground">
+      22, 🇮🇹, BSc Computer Engineering @ PoliMi
+    </p>
+    <div className="flex items-center gap-2">
+      <p className="text-muted-foreground">Currently in San Francisco</p>
+      <Shield
+        icon="simple-icons:x"
+        href="https://twitter.com/DereWah"
+        text="@DereWah"
+        variant="subtle"
+      />
+    </div>
   </div>
 </div>
 
@@ -106,12 +144,7 @@ Real-time generative video and World Models are technologies we're going to see 
 Also I have a blog! Check it out, if you liked this project, you'll find many similar ones there.
 
 <div className="flex flex-wrap gap-2 mt-4">
-
-  <Shield 
-    icon="mdi:web" 
-    href="https://derewah.dev" 
-    text="My Portfolio" 
-  />
+  <Shield icon="mdi:web" href="https://derewah.dev" text="My Portfolio" />
 </div>
 
 ---
