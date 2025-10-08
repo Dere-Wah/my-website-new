@@ -143,14 +143,14 @@ export default function Greeting() {
         👋
       </motion.span>
       <span className="whitespace-nowrap bg-gradient-to-br from-foreground via-foreground/90 to-foreground/70 dark:from-blue-400 dark:via-cyan-400 dark:to-sky-400 bg-clip-text text-transparent">
-        , I'm Dere*
+        , I'm Davide*
       </span>
       <motion.span
         animate={{ opacity: showAka ? 1 : 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="text-sm text-muted-foreground ml-2 md:mt-0 w-full text-end min-h-[1.25rem] block opacity-0"
       >
-        *(aka Davide)
+        *(aka Dere)
       </motion.span>
     </div>
   );
