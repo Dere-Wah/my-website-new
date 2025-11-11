@@ -5,7 +5,10 @@ description: "And how you can train basically anything with this workflow!"
 tags: ["AI", "Workflow"]
 published: true
 thumbnail: "https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/thumbnail1.png?raw=true"
+video_thumbnail: "https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/escaping.mp4?raw=true"
+video_thumbnail_className: "-my-24 md:-my-56"
 ---
+
 import { Shield } from "../components/ui/shield";
 import { SafeVideo } from "../components/safe-video";
 
@@ -14,45 +17,60 @@ import { SafeVideo } from "../components/safe-video";
 In this post, I’ll guide you through my journey of setting up a neural network (NN) capable of simulating **Mario Kart** gameplay, frame by frame, based on the previous frame and a steering input (left or right). This was achieved **without embedding traditional game logic into the code**. Let's dive into the inspiration, technical challenges, and final implementation of this ambitious project.
 
 <div className="text-ebony-clay-50 flex flex-wrap gap-1 w-full">
-<Shield icon="twemoji:hugging-face" href="https://huggingface.co/DereWah/diamond-mariokart64" text="Model"></Shield>
-<Shield icon="twemoji:hugging-face" href="https://huggingface.co/datasets/DereWah/mk64-steering" text="Dataset"></Shield>
-<Shield icon="mdi:github" href="https://github.com/Dere-Wah/AI-MarioKart64" text="Codebase"></Shield>
-<Shield icon="mdi:discord" href="https://discord.gg/uMF94QreGc" text="Discord"></Shield>
+  <Shield
+    icon="twemoji:hugging-face"
+    href="https://huggingface.co/DereWah/diamond-mariokart64"
+    text="Model"
+  ></Shield>
+  <Shield
+    icon="twemoji:hugging-face"
+    href="https://huggingface.co/datasets/DereWah/mk64-steering"
+    text="Dataset"
+  ></Shield>
+  <Shield
+    icon="mdi:github"
+    href="https://github.com/Dere-Wah/AI-MarioKart64"
+    text="Codebase"
+  ></Shield>
+  <Shield
+    icon="mdi:discord"
+    href="https://discord.gg/uMF94QreGc"
+    text="Discord"
+  ></Shield>
 </div>
 
-
 <div className="flex flex-wrap justify-center gap-1">
-	<SafeVideo
-		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/escaping.mp4?raw=true"
-		className="w-2/5 justify-center aspect-square"
-		autoPlay
-		loop
-		muted
-		playsInline
-	/>
-	<SafeVideo
-		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/turn.mp4?raw=true"
-		className="w-2/5 justify-center aspect-square"
-		autoPlay
-		loop
-		muted
-		playsInline
-	/>
-	<SafeVideo
-		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/tunnel.mp4?raw=true"
-		className="w-2/5 justify-center aspect-square"
-		autoPlay
-		loop
-		muted
-		playsInline
-	/>
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/escaping.mp4?raw=true"
+    className="w-2/5 justify-center aspect-square"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/turn.mp4?raw=true"
+    className="w-2/5 justify-center aspect-square"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/tunnel.mp4?raw=true"
+    className="w-2/5 justify-center aspect-square"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
 </div>
 
 ---
 
 ## Initial Inspiration
 
-My journey began after seeing Google train an AI to play **DOOM**, showcasing how neural networks can excel in simulating game behavior. Although I was fascinated by the concept, my limited AI knowledge held me back.  
+My journey began after seeing Google train an AI to play **DOOM**, showcasing how neural networks can excel in simulating game behavior. Although I was fascinated by the concept, my limited AI knowledge held me back.
 
 Things changed when **AI Minecraft** went viral. Seeing that success rekindled my interest and convinced me this approach could work for any game. I began researching existing models and techniques.
 
@@ -91,7 +109,7 @@ Since no pre-existing SM64 dataset was available, I built a simple program to re
 
 - **Time-Intensive**: Capturing even a small portion of the game’s map took hours of manual effort.
 - **Insufficient Data**: Initial tests with just a few minutes of gameplay led to poor results.  
-   *(Check out the preliminary output: [**`YouTube link`**](https://youtu.be/2GYaArkV3Ig)).*
+   _(Check out the preliminary output: [**`YouTube link`**](https://youtu.be/2GYaArkV3Ig))._
 
 ![The first version of AISM64.](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/sm64ai.gif?raw=true)
 
@@ -119,20 +137,20 @@ Understanding the dataset format is critical to training the NN. The DIAMOND mod
 
 1. **Frame Keys**: Each key represents a frame and follows this pattern:  
    `frame_<N>_x` (image data) and `frame_<N>_y` (input data), where `N` is the frame number (0-999 per file).
-   
 2. **Image Data** (`_x`):  
    Each frame is stored as a 3D array with dimensions `(240 x 320 x 3)`:
+
    - `240 x 320`: Height and width.
    - `3`: RGB color channels.  
-   *(Note: Height and width often swap during tensor conversion—an issue you’ll need to debug when preprocessing.)*
+     _(Note: Height and width often swap during tensor conversion—an issue you’ll need to debug when preprocessing.)_
 
 3. **Input Data** (`_y`):  
    A vector representing the player's actions for that frame:
    - The vector’s size equals the number of input actions (e.g., `4` for WASD controls).
    - Example for WASD: `[1, 0, 0, 1]` means W and D are pressed simultaneously.
 
-
 Here’s a simple example of the input vector structure:
+
 ```python
 
 # Input action example: WASD controls
@@ -154,6 +172,7 @@ For more on the dataset format, check out the [**`CSGO dataset guide`**](https:/
 The **NeuralKart** neural network plays MK64 on an emulator via a **local TCP server**. The emulator runs a Lua script to send and receive inputs from the server, enabling real-time communication. My task was to intercept and capture these interactions to build a dataset.
 
 NeuralKart controls the emulator using a **steering input** ranging from `-1.0` to `1.0`:
+
 - `-1.0`: Full left steer.
 - `1.0`: Full right steer.
 - `0.0`: No steering.
@@ -172,27 +191,28 @@ To convert the steering value into a vector of size 20 (representing 20 uniform 
 def decimal_to_vector(decimal_number):
     # Initialize a list of 20 zeros
     vector = [0] * 20
-    
+
     # Ensure the decimal_number is within the expected range
     decimal_number = max(-1.0, min(decimal_number, 1.0))
-    
+
     # Calculate the index based on the input decimal number
     # Map -1.0 to 0, ..., 0.0 to 10, ..., 1.0 to 19
     index = round((decimal_number + 1.0) * 10)
-    
+
     # Cap the index at 19 to handle the case where decimal_number is exactly 1.0
     index = min(index, 19)
-    
+
     # Set the appropriate position in the vector to 1
     vector[index] = 1
-    
+
     return vector
 ```
 
-- This splits the steering interval into 20 discrete steps.  
+- This splits the steering interval into 20 discrete steps.
 - Each vector has exactly one `1`, indicating the corresponding steering range.
 
 For example:
+
 - A steering value of `-1.0` maps to: `[1, 0, 0, ..., 0]`.
 - A steering value of `0.0` maps to: `[0, ..., 1, ..., 0]` (center position).
 - A steering value of `1.0` maps to: `[0, ..., 0, 1]`.
@@ -211,33 +231,34 @@ def capture_frame(prediction, img):
     global t
     global file_index
     global h5file
-    
+
     # Create a new HDF5 file after 1000 frames
     if t > 999 or h5file is None:
         file_index += 1
         if h5file is not None:
             h5file.close()
         h5file_name = file_prefix + "_" + str(file_index) + ".hdf5"
-        h5file = h5py.File(f"D:\\MK64AI_dataset\\{output_dir}/{h5file_name}", 'w')  
+        h5file = h5py.File(f"D:\\MK64AI_dataset\\{output_dir}/{h5file_name}", 'w')
         t = 0
         print("Saving HDF5 file and creating the next...")
 
     # Convert the image from BGRA to BGR (OpenCV format)
     img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
     img = cv2.resize(img, (target_width, target_height))
-    
+
     # Convert the prediction (decimal) to a one-hot vector
     vector = decimal_to_vector(prediction)
-    
+
     # Save frame data to the HDF5 file
     h5file.create_dataset(f"frame_{t}_x", data=img)
     h5file.create_dataset(f"frame_{t}_y", data=vector)
-    
+
     t += 1
     return True
 ```
 
 **Key features of the function:**
+
 - **HDF5 File Management**: Automatically creates new files after 1000 frames to keep datasets manageable.
 - **Image Processing**: Converts gameplay frames to the required format (removing the alpha channel and resizing).
 - **Data Storage**: Saves both image data (`X`) and steering input vectors (`Y`) for each frame.
@@ -251,11 +272,12 @@ def capture_frame(prediction, img):
 To train the DIAMOND model effectively, the dataset needed to include diverse scenarios. I generated two types of data:
 
 1. **Noised Data**:  
-   Introduced randomness to the steering values produced by NeuralKart, simulating a range of driving behaviors. For example, the AI might randomly steer slightly left when it would normally go straight.  
+   Introduced randomness to the steering values produced by NeuralKart, simulating a range of driving behaviors. For example, the AI might randomly steer slightly left when it would normally go straight.
+
    - Purpose: Teach the model to generalize better and handle edge cases.
 
 2. **Expert Data**:  
-   Used only high-quality inputs from NeuralKart (without noise).  
+   Used only high-quality inputs from NeuralKart (without noise).
    - Purpose: Provide a baseline of “ideal” steering for the network to emulate.
 
 The final dataset combined both types of data to balance realism and optimal behavior.
@@ -265,28 +287,29 @@ The final dataset combined both types of data to balance realism and optimal beh
 ## Dataset Limitations and Observations
 
 While collecting data, I noticed some inherent limitations in the dataset:
+
 - **No U-Turns**: Since the dataset lacked examples of full 180° turns, the trained NN could only make small corrections instead of completely reversing direction.
 - **Wall Collisions**: Crashes into walls were rare in the dataset. When the NN encountered such a scenario, it struggled to simulate an impact and instead attempted to continue generating the track ahead.
 
 These limitations highlight the importance of carefully curating datasets to cover edge cases.
 
 <div className="flex flex-wrap justify-center gap-1">
-	<SafeVideo
-		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/flicker.mp4?raw=true"
-		className="w-2/5 justify-center aspect-square"
-		autoPlay
-		loop
-		muted
-		playsInline
-	/>
-	<SafeVideo
-		src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/wallhit.mp4?raw=true"
-		className="w-2/5 justify-center aspect-square"
-		autoPlay
-		loop
-		muted
-		playsInline
-	/>
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/flicker.mp4?raw=true"
+    className="w-2/5 justify-center aspect-square"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/ai-mariokart/wallhit.mp4?raw=true"
+    className="w-2/5 justify-center aspect-square"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
 </div>
 
 In the clip above you can see some interesting details captured by the model. For instance, in clip #1 when the kart passes the finish line, you can see the time trial counter actually flicker.
@@ -307,10 +330,12 @@ With the dataset prepared, the next step was to train DIAMOND to interpret the d
 DIAMOND’s training framework requires data preprocessing to convert the raw HDF5 files into a format suitable for training. This step involves modifying the `process_csgo_tar_files.py` script from the DIAMOND repository. By inspecting the provided [**`GitHub commit`**](https://github.com/Dere-Wah/AI-MarioKart64/commit/66edbe55efe3872235ed79cdbbebae628388e0f8), I made the following adjustments:
 
 1. **Update Data Paths**:
+
    - Modify the script to read HDF5 files from the `MK64AI_dataset` directory.
    - Ensure it processes image data (`X`) and corresponding steering vectors (`Y`).
 
 2. **Resolution Scaling**:
+
    - Ensure that data preprocessing maintains consistency between low-resolution (64x48) and full-resolution (320x240) inputs.
 
 3. **Output Directory**:
@@ -325,16 +350,18 @@ DIAMOND’s training framework requires data preprocessing to convert the raw HD
 DIAMOND’s training configuration required several adjustments to support Mario Kart 64 instead of CSGO. Here’s how I adapted the key configuration files:
 
 1. **`config/agent/csgo.yaml`**:
+
    - **Upsampling Factor**:
      - For 320x240 full-resolution and 64x48 low-resolution data, the **upsampling factor** remained `5` (`320/64 = 5`).
      - If resolutions differ, calculate the factor accordingly.
    - Example:
-     ```yaml
 
+     ```yaml
      upsampling_factor: 5
      ```
 
 2. **`config/env/csgo.yaml`**:
+
    - **Input Resolution**:
      - Update the `size` field to `[320, 240]` for full resolution.
      - Ensure the order matches the input data (`width` x `height`).
@@ -344,11 +371,13 @@ DIAMOND’s training configuration required several adjustments to support Mario
      - Update `path_data_low_res` and `path_data_full_res` to point to the preprocessed datasets.
 
 3. **`config/trainer.yaml`**:
+
    - Adjust training parameters for both the **denoiser** and **upsampler**:
+
      - Reduce `steps_per_epoch` and increase flexibility for testing different configurations.
      - Example (Denoiser):
-       ```yaml
 
+       ```yaml
        denoiser:
          training:
            num_autoregressive_steps: 4
@@ -356,9 +385,10 @@ DIAMOND’s training configuration required several adjustments to support Mario
            steps_first_epoch: 100
            steps_per_epoch: 100
        ```
-     - Example (Upsampler):
-       ```yaml
 
+     - Example (Upsampler):
+
+       ```yaml
        upsampler:
          training:
            num_autoregressive_steps: 1
@@ -395,11 +425,12 @@ Training DIAMOND for Mario Kart 64 required careful optimization of batch sizes 
 The training is divided into two key components: the **Denoiser** and the **Upsampler**. Each of these components required separate optimization due to differences in data resolution and GPU memory requirements.
 
 1. **Denoiser**:
+
    - **Resolution**: 64x48 (low resolution).
    - **Optimal Batch Size**: **28** on a 40GB GPU.
-   - **Gradient Accumulation Steps**: **6**. 
-     - This value is multiplied by the steps per epoch to calculate the total steps in an epoch. 
-   - **Rationale**: 
+   - **Gradient Accumulation Steps**: **6**.
+     - This value is multiplied by the steps per epoch to calculate the total steps in an epoch.
+   - **Rationale**:
      - The denoiser processes data at a smaller resolution, allowing for a relatively larger batch size.
      - If you were to decrease the batch size you should increase the Gradient Accumulation steps.
 
@@ -419,10 +450,11 @@ The training is divided into two key components: the **Denoiser** and the **Upsa
 The training process required adjustments to the number of steps per epoch to control training duration and allow for iterative testing. These values were optimized based on your experimentation:
 
 1. **Denoiser**:
+
    - **Steps Per Epoch**: **100**.
    - **Epochs**: Configured for 6 epochs (\( 6 \times 100 = 600 \) steps in total).
    - **Initial Steps for First Epoch**: Set to match regular steps (\( 100 \)).
-   - **Reasoning**: 
+   - **Reasoning**:
      - The smaller step count per epoch allows for flexibility in testing configurations and monitoring performance over shorter intervals.
 
 2. **Upsampler**:
@@ -436,6 +468,7 @@ The training process required adjustments to the number of steps per epoch to co
 Managing GPU memory was crucial, especially for the upsampler, which handles larger inputs. During the first epoch, memory usage was observed to be lower than in subsequent epochs. To prevent crashes:
 
 - **Reserve Headroom**:
+
   - Avoided completely maxing out VRAM during the first epoch.
   - Allowed for memory spikes in later epochs.
 
@@ -447,6 +480,7 @@ Managing GPU memory was crucial, especially for the upsampler, which handles lar
 ## **Final Values for Training**
 
 - **Denoiser**:
+
   - Gradient Accumulation Steps: 6
   - Batch Size: 28
   - Steps Per Epoch: 100
@@ -477,7 +511,6 @@ Upon training completion (or interruption), DIAMOND saves results in the `output
 
 - `checkpoints/state.pt`: Contains all training parameters (4GB, not needed for inference).
 - `agent_versions/<checkpoint>.pt`: Smaller checkpoint file (~1.42GB) used for inference.
-
 
 Now that your model is trained, the next step is to make it play the game. This requires some reverse engineering to integrate the Neural Network (NN) into the Mario Kart 64 emulator. Let’s proceed step by step.
 
@@ -510,26 +543,28 @@ To generate spawns for Mario Kart 64, we randomly select frames and actions from
 
 1. **Randomly Select Frames:**
    The starting frame is randomly chosen from the range `[0, 799]`, ensuring space for the next 200 frames. For each of the first four frames:
+
    - Extract the image and action data (`X` and `Y`) from the HDF5 file.
    - Generate the low-resolution version of the image by resizing it using bicubic interpolation.
    - Save both the full-res and low-res images.
 
    Code example:
+
    ```python
 
    i = random.randint(0, 799)
    for j in range(4):
        frame_x = f'frame_{i}_x'
        frame_y = f'frame_{i}_y'
-       
+
        if frame_x in h5file and frame_y in h5file:
            # Append the frames
            data_x = h5file[frame_x][:]
            data_y = h5file[frame_y][:]
-           
+
            data_x_frames.append(data_x)
            data_y_frames.append(data_y)
-           
+
            # Save full-res image
            image = Image.fromarray(data_x)
            image.save(spawn_dir / f"{existing_spawns}/full_res_{j}.png")
@@ -544,6 +579,7 @@ To generate spawns for Mario Kart 64, we randomly select frames and actions from
    After selecting the first four frames, iterate through the next 200 frames to save only the action vectors (`Y` data).
 
    Code example:
+
    ```python
 
    for _ in range(200):
@@ -558,21 +594,20 @@ To generate spawns for Mario Kart 64, we randomly select frames and actions from
    `(FRAME_N, COLOR_CHANNEL, H, W)`.
 
    Code example:
+
    ```python
 
    data_x_stacked = np.stack(data_x_frames)
    data_y_stacked = np.stack(data_y_frames)
    next_act_stacked = np.stack(next_act_frames)
    low_res_stacked = np.stack(low_res_frames)
-   
+
    low_res_stacked = np.transpose(low_res_stacked, (0, 3, 1, 2))
    data_x_stacked = np.transpose(data_x_stacked, (0, 3, 1, 2))
    ```
 
 4. **Save the Spawns:**
    The `spawn.py` script also saves images of the full-resolution frames so you can preview the spawns. This is helpful for selecting interesting starting points. Spawns are saved in the `./training/csgo/spawn` folder, which you need to create manually.
-
-
 
 ---
 
@@ -586,6 +621,7 @@ To generate spawns for Mario Kart 64, we randomly select frames and actions from
 ## **Updating Configuration Files**
 
 Lastly, ensure that your training configurations (e.g., resolution, number of actions, etc.) match the setup in your DIAMOND environment. For example:
+
 - Update the **path_data** values in the spawn configuration files to point to your dataset.
 - Match the `upsampling_factor` and resolution settings in the appropriate YAML files.
 
@@ -609,16 +645,19 @@ This section involves customizing the environment to map your keyboard inputs to
 
 1. **`N_KEYS` Definition**  
    At the start of the file, update:
+
    ```python
 
    N_KEYS = 20  # Update this to the size of your action vector
    ```
+
    Replace `20` with the number of elements in your action vector.
 
 2. **Decimal to Vector and Vector to Decimal Functions**  
    These functions map a floating-point value (e.g., steering input) to a one-hot vector and back. Here's a closer look:
 
-   - **`decimal_to_vector`**: Converts a decimal value (e.g., -1.0 to 1.0 for steering) into a one-hot vector of size `N_KEYS`.  
+   - **`decimal_to_vector`**: Converts a decimal value (e.g., -1.0 to 1.0 for steering) into a one-hot vector of size `N_KEYS`.
+
      ```python
 
      def decimal_to_vector(decimal_number):
@@ -630,7 +669,8 @@ This section involves customizing the environment to map your keyboard inputs to
          return vector
      ```
 
-   - **`vector_to_decimal`**: Converts a one-hot vector back to a decimal value.  
+   - **`vector_to_decimal`**: Converts a one-hot vector back to a decimal value.
+
      ```python
 
      def vector_to_decimal(vector):
@@ -645,8 +685,9 @@ This section involves customizing the environment to map your keyboard inputs to
 
    - **`encode_csgo_action`**  
      Converts user inputs into a vector. This function encodes keys, and if applicable, mouse movements. For a simplified setup without mouse inputs:
+
      ```python
-     
+
      def encode_csgo_action(csgo_action: CSGOAction, device: torch.device) -> torch.Tensor:
          keys_pressed_onehot = np.zeros(N_KEYS)
          keys_pressed_onehot[decimal_to_vector(csgo_action.steering_value)] = 1
@@ -655,6 +696,7 @@ This section involves customizing the environment to map your keyboard inputs to
 
    - **`decode_csgo_action`**  
      Decodes the neural network’s vector output into a `CSGOAction` object for processing:
+
      ```python
 
      def decode_csgo_action(y_preds: torch.Tensor) -> CSGOAction:
@@ -670,7 +712,8 @@ This section involves customizing the environment to map your keyboard inputs to
 
 # High-Level Action Structure
 
-## The CSGOAction Class  
+## The CSGOAction Class
+
 This class represents all inputs (keys, mouse, and clicks). For keyboard-only setups, you can strip it down to just the keys:
 
 ```python
@@ -680,8 +723,10 @@ class CSGOAction:
     keys: List[int]  # Replace with keys alone
 ```
 
-## Key Mapping Example  
+## Key Mapping Example
+
 To encode specific keys into vector positions, modify:
+
 ```python
 
 def encode_csgo_action(csgo_action: CSGOAction, device: torch.device) -> torch.Tensor:
@@ -701,10 +746,11 @@ def encode_csgo_action(csgo_action: CSGOAction, device: torch.device) -> torch.T
 
 1. **Adjust Input Mapping to Match Your Game**  
    Map each key to a specific index in your action vector. For example:
+
    - `W` → Forward movement
    - `A` → Turn left
    - `D` → Turn right  
-   Ensure the mapping aligns with how your neural network was trained.
+     Ensure the mapping aligns with how your neural network was trained.
 
 2. **Test and Iterate**  
    The vector encoding must precisely match what your model expects. Errors here will result in incorrect behavior.
@@ -725,6 +771,7 @@ This section focuses on how the game generates `CSGOAction` objects and integrat
 ## Understanding the Workflow
 
 1. **World Model Environment (`./src/envs/world_model_env.py`)**
+
    - **`reset()` Function**:  
      This initializes the environment by calling `self.generator_init.send()`, which determines a new spawn point. It sets the high-resolution and low-resolution images (stored in `obs` and `act` variables) for processing.  
      HX and CX (used for reinforcement learning) can be ignored here, as they are not relevant in this version of the code.
@@ -733,9 +780,11 @@ This section focuses on how the game generates `CSGOAction` objects and integrat
      This function calculates the next observation, upsamples it, and interacts with the neural network. It serves as the interface between the environment and the `CSGOAction`.
 
 2. **Game Environment (`./src/game/playenv.py`)**
+
    - This file interacts with `world_model_env.py`, calling its `reset()` and `step()` functions to process game logic.
 
 3. **Key Event Handling (`./src/game/game.py`)**
+
    - This is where `pygame` captures player inputs. In the `run()` function:
      - `pygame.KEYDOWN` adds pressed keys to the `keys_pressed` list.
      - `pygame.KEYUP` removes released keys from the `keys_pressed` list.
@@ -757,18 +806,21 @@ This section focuses on how the game generates `CSGOAction` objects and integrat
 ## Customizing CSGOAction
 
 The default `CSGOAction` includes keys, mouse movements, and click data:
+
 ```python
 
 csgo_action = CSGOAction(keys_pressed, mouse_x, mouse_y, l_click, r_click)
 ```
 
 In a keyboard-only setup, you can simplify it. For example:
+
 ```python
 
 csgo_action = CSGOAction(keys_pressed)
 ```
 
 Then adjust the `CSGOAction` class accordingly:
+
 ```python
 
 @dataclass
@@ -810,6 +862,7 @@ def get_steering_value(keys_pressed):
 ```
 
 Incorporate it into the `run()` function:
+
 ```python
 
 k = get_steering_value(keys_pressed)
@@ -826,18 +879,21 @@ This method ensures intuitive and responsive control without requiring a joystic
 ## Redirecting the Model Path (`./src/play.py`)
 
 By default, `play.py` fetches the DIAMOND snapshot from Hugging Face:
+
 ```python
 
 path_hf = Path(snapshot_download(repo_id="eloialonso/diamond", allow_patterns="csgo/*"))
 ```
 
 To point it to a local directory (e.g., `./trained/`), modify it:
+
 ```python
 
 path_hf = Path("./trained/")
 ```
 
 Ensure the `./trained/` directory contains:
+
 - The game folder (`CSGO` or your equivalent).
 - The model and spawns.
 
@@ -846,6 +902,7 @@ Ensure the `./trained/` directory contains:
 ## Debugging and Troubleshooting
 
 After making these changes, errors are likely. The key to resolving them is:
+
 1. Carefully read the **stack trace** to identify where the inconsistency lies.
 2. Check if modifications to `CSGOAction` propagate correctly through all references.
 3. Test individual components, such as the `get_steering_value` function, to ensure they behave as intended.
@@ -855,12 +912,14 @@ After making these changes, errors are likely. The key to resolving them is:
 ## Final Notes
 
 This guide equips you to adapt the DIAMOND framework to your custom game environment, such as Mario Kart. However, performance limitations may arise:
+
 - A high-end GPU (e.g., 3090) is needed for decent FPS (around 10 FPS).
 - Lower-spec systems might experience significant lag (e.g., 0.2 FPS on a 4GB VRAM GPU).
 
 ## Community Support
 
 For additional help:
+
 - Join the [**`DIAMOND Discord`**](https://discord.gg/uMF94QreGc) and explore the `#training-support` channel.
 - Document your debugging process, as this can aid others with similar challenges.
 

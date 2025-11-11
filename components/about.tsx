@@ -51,11 +51,6 @@ export default function About() {
             To trick myself into finishing things, I started a blog. Writing
             about my projects while I work on them weirdly keeps me on track.
           </p>
-
-          <p className="text-lg leading-relaxed">
-            Take a look around! There’s probably something half-finished with a
-            dramatic title waiting for you.
-          </p>
         </div>
       </motion.div>
     </section>
