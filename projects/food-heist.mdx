@@ -1,0 +1,417 @@
+---
+title: "How We Hacked a Billion-Dollar Company for Unlimited Snacks"
+date: "2025-11-23"
+description: "description and thumbnail tbd. all wip"
+tags: ["Reverse Engineering", "Exploitation"]
+published: true
+thumbnail: "/assets/blog/food-heist/games.png"
+---
+
+import { Callout } from "../components/ui/callout";
+
+### Who can resist free food?
+
+I certainly can’t.
+
+As a human being, I deeply love feeding my body — especially when delicious items enter that body without money leaving my bank account. So when a fast-food giant (let’s call them *ChickenDonald* because it is legally safer and comedically superior) launched a new in-app section labeled **“Games”**, my instincts activated instantly.
+
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The button inviting me to open the games
+    section](/assets/blog/food-heist/games.png)
+  </div>
+</div>
+
+I tapped it.  
+Of course I tapped it.
+
+And there it was: a limited-time national contest where your score in a silly minigame could win you… **a full year of free chicken nuggets.**
+
+Suddenly, this wasn’t just a game.  
+This was spiritual.  
+This was destiny.  
+This was “beat the game -> free food.”
+
+Naturally, one thing would lead to another.  
+Naturally, that “another” would be reverse-engineering their corporate minigame until it begged for mercy.
+
+---
+
+## **The Game That Looked Too Simple**
+
+After grabbing my order, I opened the game.
+
+It was a smooth, cartoony obstacle-dodging minigame — the type that looks like it was born in two weeks and raised on caffeine. Everything about it screamed *client-side*: no server checks, no real-time validation, nothing that felt robust enough to withstand a determined raccoon with a laptop.
+
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The game](/assets/blog/food-heist/game-look.jpg)
+  </div>
+</div>
+
+And I thought:  
+“What if… instead of playing it normally… we play it *creatively*?”
+
+---
+
+## **Attempt #1: Beating It With AI Because Why Not**
+
+My first idea was noble but incredibly stupid:  
+I spent 36 full hours programming a pixel-perfect clone of the game in PyGame so I could eventually train an AI to master it automatically.
+
+In theory: genius.  
+In practice: every tiny mismatch — gravity, hitbox size, jump arc, anything — caused the AI to behave like a confused toaster.
+
+I was sleep-deprived, my clone barely worked, and I had learned nothing except that chicken-based flappy games hate me.
+
+So I called my friend Sean.  
+I showed him the repo.  
+He listened patiently.
+
+Then he said the sentence that reset my brain:
+
+“Why don’t we just cheat the *real* game?”
+
+And honestly?  
+That was the smartest thing anyone had said to me in days.
+
+Goodbye, PyGame clone.  
+Your service was appreciated but unnecessary.
+
+---
+
+## **Discovering the Hidden Web Version**
+
+The next morning, Sean sent me a screenshot while I was walking to the gym.
+
+He had intercepted a network request from the ChickenDonald mobile app.  
+Inside the request was a URL… pointing to **a fully playable web version of the game.**
+
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The login landing page](/assets/blog/food-heist/login.jpg)
+  </div>
+</div>
+
+This was huge.
+
+If the game ran in a browser, that meant:
+
+- inspectable source code
+- editable JavaScript
+- viewable network calls
+- full control over every pixel of chicken-related physics
+
+I ran home, opened the URL on my computer, and there it was:  
+the entire official game, running inside Chrome like a nervous intern waiting to be exploited.
+
+---
+
+## **The Login Problem**
+
+At the bottom of the game was a “Login” button.
+
+I clicked it.  
+Nothing happened.
+
+It wasn’t broken — it simply expected to be inside the mobile app, where the app would inject a function to perform the login process.  
+Chrome, tragically, is not a mobile app.
+
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The endpoint failing](/assets/blog/food-heist/route.jpg)
+  </div>
+</div>
+
+But we found something far more interesting while digging through the mess of obfuscated code:
+
+The game checked **localStorage** — a tiny storage space in your browser — for a **bearer token**.  
+If the token existed, BOOM: you were instantly considered logged in.
+
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The code checking for log-in](/assets/blog/food-heist/code-snippet.jpg)
+  </div>
+</div>
+
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The endpoint failing](/assets/blog/food-heist/saving.jpg)
+  </div>
+</div>
+
+So all we needed was that token.
+
+---
+
+## **Getting Inside the Game**
+
+Using request interception on my phone, I captured the exact authentication token the app used when contacting the server.
+
+Then I pasted that token directly into Chrome’s localStorage.
+
+Refreshed the page.
+
+**Now we were logged in.  
+Inside the official game.  
+Running our own tools.**
+
+We could finally see how the score system worked — which meant we could finally break it.
+
+---
+
+## \*\*The Score Payload Problem
+
+Our first thought was simple:  
+“Can we just fake a high score and send it to the server?”
+
+No.  
+Absolutely not.
+
+The final score submission wasn’t a clean number like `{ score: 99999 }`.  
+It was an enormous encrypted blob containing:
+
+- timestamps
+- action histories
+- taps and input actions
+- collected points events
+- damage events
+- a hash of the whole payload
+
+This meant you couldn’t simply edit the message.  
+Every field depended on other fields.  
+If one changed, the entire hash system collapsed.
+
+But here’s the catch:
+
+**All those complicated values were being generated on the client.  
+And if the client is editable… the proof system will happily “prove” whatever reality you create.**
+
+We didn’t need to forge a score.  
+We needed to **modify the game so that genuinely playing it produced a ridiculous score.**
+
+---
+
+## **Diving Into the Obfuscated Code**
+
+The real game logic wasn’t in the obvious JavaScript files.  
+It was buried deep inside a giant, heavily obfuscated script.
+
+So we de-obfuscated it.
+
+Suddenly, it went from unreadable spaghetti to… well, spaghetti you could at least identify the ingredients of.
+
+We searched for:
+
+- damage calculation
+- health variables
+- collision detection
+- anything that controlled player survival
+
+Eventually, we found the **damage handler.**
+
+It worked like this:
+
+```
+if (playerHasShield) {
+  // ignore damage
+} else {
+  playerHealth -= someAmount;
+}
+```
+
+Perfect.  
+We simply forced it to always take the “ignore damage” route.
+
+Instant immortality.
+
+---
+
+## **Oops: Immortal People Cannot Die**
+
+The first time I tested it, I became undefeatable.
+
+I could play forever.  
+Nothing hurt me.  
+I was the chicken messiah.
+
+But also:  
+**I couldn’t die, which meant I couldn’t submit a score.**
+
+Closing the tab removed my modifications.  
+Which was… unfortunate.
+
+So I added a new variable:
+
+```
+stopCheating = false
+```
+
+Whenever I wanted to die (to trigger the final score submission), I just opened the console and set:
+
+```
+stopCheating = true
+```
+
+Boom.  
+Damage turned back on.
+Problem solved.
+
+---
+
+## **We Accidentally Snitched on Ourselves**
+
+After our very first successful immortal run, I checked the network logs out of paranoia.
+
+Then my stomach dropped.
+
+The game had sent an error log to **Sentry** — the developer’s error-tracking service — containing one of my modified code lines.
+
+Including the original variable name I had used:
+
+```
+stopCheating
+```
+
+Yes.  
+The app literally told the developers:
+
+“Someone added a variable named stopCheating.”
+
+Not ideal.
+
+We immediately renamed it to **enableDebug**, which sounded like a boring leftover from development rather than a confession.
+
+We didn't know if they were going to find us out by this minor mistake, so we also deleted the account to make sure no trace was left.
+
+Crisis somewhat averted.
+
+---
+
+## **Building Tools, Because Why Stop Now?**
+
+Once things worked, we went full mad-scientist:
+
+<Callout emoji="💡">We added a custom UI overlay for toggling cheats</Callout>
+
+<Callout emoji="💡">
+  We built a separate website tracking leaderboard movements
+</Callout>
+
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The leaderboard website.](/assets/blog/food-heist/leaderboard.jpeg)
+  </div>
+</div>
+
+<Callout emoji="💡">
+  We created a Discord bot to notify us of suspicious accounts cheating up their
+  score
+</Callout>
+
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The tracking discord webhook.](/assets/blog/food-heist/tracking.jpg)
+  </div>
+</div>
+
+<Callout emoji="💡">
+  We set up “sleeper” accounts that slowly climbed the rankings to avoid
+  suspicion
+</Callout>
+
+Because at this point, this wasn’t a cheat — it was a craft.  
+A lifestyle.  
+A chicken-fueled art project.
+
+---
+
+## **The Final Plan**
+
+We didn’t want to look suspicious.
+
+So our strategy was:
+
+- never jump too high in the leaderboard too fast
+- keep our accounts in realistic positions
+- run our big “immortal sessions” near the very end
+- make each run last 1–2 hours so the data looked human
+
+We prepared everything.  
+Timers, scripts, snacks.  
+This was our Super Bowl.
+
+---
+
+## **The Last Hour**
+
+The final hour of the contest arrived.
+
+Our long games were already running.
+
+At 5 minutes before closing, we waited.  
+At 4 minutes, we waited more.  
+At 3 minutes, stress.  
+At 2 minutes, panic warming up.  
+At 1 minute, we finally killed our characters.
+
+Everything seemed to go smoothly. All the chrome tabs sent out the submission HTTP request, containing the huge data about the run.
+
+It wasn't immediate. The payload of the request was multiple MBs long, because it contained all of the events of the 3 hours game.
+
+We held our breath.
+
+Then:  
+**Error.**
+
+They had shut score submissions **five minutes early**.
+
+Three-hour immortal runs?  
+Gone.  
+Poof.
+
+Luckily, our sleeper accounts had been slowly climbing for days and still landed safely in prize range.
+
+---
+
+## **One Month of Silence**
+
+The rules said winners would be contacted within 30 days.
+
+Thirty days passed.  
+Nothing.
+
+We assumed they caught us.  
+We assumed Sentry betrayed us.  
+We assumed we were doomed.
+
+Then, we got a notification.
+
+An email.  
+From ChickenDonald.
+
+We.  
+Had.  
+Won.
+
+Free chicken for an entire year.
+
+We did it.
+
+---
+
+## **The Weekly Ritual**
+
+Now, every Sunday, without fail, we gather at the nearest ChickenDonald.  
+We redeem our free chicken.  
+We eat like champions.  
+We laugh about the chaos that brought us here.
+
+At first, we had to explain to the staff why we were legally entitled to free food.  
+Now they know us.  
+They see us walk in, die inside, and begin preparing almost instinctively.
+
+One manager even asked for a picture with us.
+
+Honestly?  
+Worth every line of code we mangled.
