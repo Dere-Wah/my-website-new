@@ -13,7 +13,7 @@ import { Callout } from "../components/ui/callout";
 
 I certainly can’t.
 
-As a human being, I deeply love feeding my body — especially when delicious items enter that body without money leaving my bank account. So when a fast-food giant (let’s call them *ChickenDonald* because it is legally safer and comedically superior) launched a new in-app section labeled **“Games”**, my instincts activated instantly.
+As a human being, I deeply love feeding my body, especially when delicious items enter that body without money leaving my bank account. So when a fast-food giant (let's call them _ChickenDonald_ because it is legally safer and comedically superior) launched a new in-app section labeled **"Games"**, my instincts activated instantly.
 
 <div className="flex flex-row justify-center">
   <div className="md:w-3/4">
@@ -41,7 +41,7 @@ Naturally, that “another” would be reverse-engineering their corporate minig
 
 After grabbing my order, I opened the game.
 
-It was a smooth, cartoony obstacle-dodging minigame — the type that looks like it was born in two weeks and raised on caffeine. Everything about it screamed *client-side*: no server checks, no real-time validation, nothing that felt robust enough to withstand a determined raccoon with a laptop.
+It was a smooth, cartoony obstacle-dodging minigame that looked hastily built. Everything about it screamed _client-side_: no server checks, no real-time validation, nothing that seemed particularly secure.
 
 <div className="flex flex-row justify-center">
   <div className="md:w-3/4">
@@ -50,7 +50,7 @@ It was a smooth, cartoony obstacle-dodging minigame — the type that looks like
 </div>
 
 And I thought:  
-“What if… instead of playing it normally… we play it *creatively*?”
+"What if... instead of playing it normally... we play it _creatively_?"
 
 ---
 
@@ -60,7 +60,7 @@ My first idea was noble but incredibly stupid:
 I spent 36 full hours programming a pixel-perfect clone of the game in PyGame so I could eventually train an AI to master it automatically.
 
 In theory: genius.  
-In practice: every tiny mismatch — gravity, hitbox size, jump arc, anything — caused the AI to behave like a confused toaster.
+In practice: every tiny mismatch (gravity, hitbox size, jump arc, anything) caused the AI to behave like a confused toaster.
 
 I was sleep-deprived, my clone barely worked, and I had learned nothing except that chicken-based flappy games hate me.
 
@@ -85,7 +85,7 @@ Your service was appreciated but unnecessary.
 The next morning, Sean sent me a screenshot while I was walking to the gym.
 
 He had intercepted a network request from the ChickenDonald mobile app.  
-Inside the request was a URL… pointing to **a fully playable web version of the game.**
+Inside the request was a URL... pointing to **a fully playable web version of the game.**
 
 <div className="flex flex-row justify-center">
   <div className="md:w-3/4">
@@ -114,7 +114,7 @@ At the bottom of the game was a “Login” button.
 I clicked it.  
 Nothing happened.
 
-It wasn’t broken — it simply expected to be inside the mobile app, where the app would inject a function to perform the login process.  
+It wasn't broken; it simply expected to be inside the mobile app, where the app would inject a function to perform the login process.  
 Chrome, tragically, is not a mobile app.
 
 <div className="flex flex-row justify-center">
@@ -125,7 +125,7 @@ Chrome, tragically, is not a mobile app.
 
 But we found something far more interesting while digging through the mess of obfuscated code:
 
-The game checked **localStorage** — a tiny storage space in your browser — for a **bearer token**.  
+The game checked **localStorage** (a tiny storage space in your browser) for a **bearer token**.  
 If the token existed, BOOM: you were instantly considered logged in.
 
 <div className="flex flex-row justify-center">
@@ -156,11 +156,17 @@ Refreshed the page.
 Inside the official game.  
 Running our own tools.**
 
-We could finally see how the score system worked — which meant we could finally break it.
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The logged in game](/assets/blog/food-heist/menu.png)
+  </div>
+</div>
+
+We could finally see how the score system worked... which meant we could finally break it.
 
 ---
 
-## \*\*The Score Payload Problem
+## **The Score Payload Problem**
 
 Our first thought was simple:  
 “Can we just fake a high score and send it to the server?”
@@ -178,6 +184,10 @@ It was an enormous encrypted blob containing:
 - damage events
 - a hash of the whole payload
 
+![The logged in game](/assets/blog/food-heist/payload.jpg)
+
+<Callout emoji="🔍">The payload from an actual score submission.</Callout>
+
 This meant you couldn’t simply edit the message.  
 Every field depended on other fields.  
 If one changed, the entire hash system collapsed.
@@ -185,7 +195,7 @@ If one changed, the entire hash system collapsed.
 But here’s the catch:
 
 **All those complicated values were being generated on the client.  
-And if the client is editable… the proof system will happily “prove” whatever reality you create.**
+And if the client is editable... the proof system will happily "prove" whatever reality you create.**
 
 We didn’t need to forge a score.  
 We needed to **modify the game so that genuinely playing it produced a ridiculous score.**
@@ -199,7 +209,7 @@ It was buried deep inside a giant, heavily obfuscated script.
 
 So we de-obfuscated it.
 
-Suddenly, it went from unreadable spaghetti to… well, spaghetti you could at least identify the ingredients of.
+Suddenly, it went from unreadable spaghetti to... well, spaghetti you could at least identify the ingredients of.
 
 We searched for:
 
@@ -208,7 +218,7 @@ We searched for:
 - collision detection
 - anything that controlled player survival
 
-Eventually, we found the **damage handler.**
+Eventually, we found the **damage handler**.
 
 It worked like this:
 
@@ -239,7 +249,7 @@ But also:
 **I couldn’t die, which meant I couldn’t submit a score.**
 
 Closing the tab removed my modifications.  
-Which was… unfortunate.
+Which was... unfortunate.
 
 So I added a new variable:
 
@@ -254,8 +264,7 @@ stopCheating = true
 ```
 
 Boom.  
-Damage turned back on.
-Problem solved.
+Damage turned back on, and the problem was solved.
 
 ---
 
@@ -265,7 +274,7 @@ After our very first successful immortal run, I checked the network logs out of 
 
 Then my stomach dropped.
 
-The game had sent an error log to **Sentry** — the developer’s error-tracking service — containing one of my modified code lines.
+The game had sent an error log to **Sentry**, the developer’s error-tracking service, containing one of my modified code lines.
 
 Including the original variable name I had used:
 
@@ -273,10 +282,7 @@ Including the original variable name I had used:
 stopCheating
 ```
 
-Yes.  
-The app literally told the developers:
-
-“Someone added a variable named stopCheating.”
+Yes, the app literally told the developers: "Someone added a variable named stopCheating."
 
 Not ideal.
 
@@ -292,9 +298,15 @@ Crisis somewhat averted.
 
 Once things worked, we went full mad-scientist:
 
-<Callout emoji="💡">We added a custom UI overlay for toggling cheats</Callout>
+<Callout emoji="👇">We added a custom UI overlay for toggling cheats</Callout>
 
-<Callout emoji="💡">
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The leaderboard website.](/assets/blog/food-heist/popup.jpg)
+  </div>
+</div>
+
+<Callout emoji="👇">
   We built a separate website tracking leaderboard movements
 </Callout>
 
@@ -304,7 +316,7 @@ Once things worked, we went full mad-scientist:
   </div>
 </div>
 
-<Callout emoji="💡">
+<Callout emoji="👇">
   We created a Discord bot to notify us of suspicious accounts cheating up their
   score
 </Callout>
@@ -315,14 +327,7 @@ Once things worked, we went full mad-scientist:
   </div>
 </div>
 
-<Callout emoji="💡">
-  We set up “sleeper” accounts that slowly climbed the rankings to avoid
-  suspicion
-</Callout>
-
-Because at this point, this wasn’t a cheat — it was a craft.  
-A lifestyle.  
-A chicken-fueled art project.
+Because at this point, this wasn't just a cheat. It had become a craft, a lifestyle, a chicken-fueled art project that consumed our every waking moment.
 
 ---
 
@@ -335,11 +340,11 @@ So our strategy was:
 - never jump too high in the leaderboard too fast
 - keep our accounts in realistic positions
 - run our big “immortal sessions” near the very end
-- make each run last 1–2 hours so the data looked human
+- make each run last 1-2 hours so the data looked human
 
-We prepared everything.  
-Timers, scripts, snacks.  
-This was our Super Bowl.
+Our strategy was very careful also because we were pretty sure someone else was doing the same thing. Other accounts were behaving similarly to ours, jumping in points and reaching scores that were hardly humanly possible.
+
+We prepared everything: timers, scripts, snacks. This was our Super Bowl, our moment of truth, our digital heist finale.
 
 ---
 
@@ -349,11 +354,7 @@ The final hour of the contest arrived.
 
 Our long games were already running.
 
-At 5 minutes before closing, we waited.  
-At 4 minutes, we waited more.  
-At 3 minutes, stress.  
-At 2 minutes, panic warming up.  
-At 1 minute, we finally killed our characters.
+At 5 minutes before closing, we waited with nervous anticipation. At 4 minutes, the tension was building. At 3 minutes, stress began creeping in. At 2 minutes, panic was warming up in the bullpen. At 1 minute, we finally killed our characters.
 
 Everything seemed to go smoothly. All the chrome tabs sent out the submission HTTP request, containing the huge data about the run.
 
@@ -361,16 +362,22 @@ It wasn't immediate. The payload of the request was multiple MBs long, because i
 
 We held our breath.
 
-Then:  
-**Error.**
+Then: **Error.**
 
-They had shut score submissions **five minutes early**.
+They had shut score submissions **five minutes early**.
 
-Three-hour immortal runs?  
-Gone.  
-Poof.
+Our three-hour immortal runs? Gone. Vanished into the digital ether like they never existed.
 
-Luckily, our sleeper accounts had been slowly climbing for days and still landed safely in prize range.
+<div className="flex flex-row justify-center">
+  <div className="md:w-1/2">
+    ![The error message.](/assets/blog/food-heist/over.png)
+  </div>
+</div>
+
+<Callout emoji="🎉">
+  Luckily, our sleeper accounts had been slowly climbing for days and still
+  landed safely in prize range.
+</Callout>
 
 ---
 
@@ -378,40 +385,38 @@ Luckily, our sleeper accounts had been slowly climbing for days and still landed
 
 The rules said winners would be contacted within 30 days.
 
-Thirty days passed.  
-Nothing.
+Thirty days passed with radio silence.
 
-We assumed they caught us.  
-We assumed Sentry betrayed us.  
-We assumed we were doomed.
+We assumed they had caught us. We assumed Sentry had betrayed us. We assumed we were doomed to a life of paying full price for chicken nuggets.
 
-Then, we got a notification.
+Then, we got a notification. An email from ChickenDonald.
 
-An email.  
-From ChickenDonald.
+<div className="flex flex-row justify-center">
+  <div className="md:w-3/4">
+    ![The email.](/assets/blog/food-heist/notification.png)
+  </div>
+</div>
 
-We.  
-Had.  
-Won.
+##### **We had won.**
 
-Free chicken for an entire year.
+#### **Free chicken for an entire year.**
 
-We did it.
+### **We did it.**
 
 ---
 
 ## **The Weekly Ritual**
 
-Now, every Sunday, without fail, we gather at the nearest ChickenDonald.  
-We redeem our free chicken.  
-We eat like champions.  
-We laugh about the chaos that brought us here.
+Now, every Sunday, without fail, we gather at the nearest ChickenDonald. We redeem our free chicken, eat like champions, and laugh about the beautiful chaos that brought us here.
 
-At first, we had to explain to the staff why we were legally entitled to free food.  
-Now they know us.  
-They see us walk in, die inside, and begin preparing almost instinctively.
+<div className="flex flex-row justify-center">
+  <div className="md:w-1/2">
+    ![The tradition.](/assets/blog/food-heist/finale.jpg)
+  </div>
+</div>
+
+At first, we had to explain to the staff why we were legally entitled to free food. Now they know us by sight. They see us walk in, die a little inside, and begin preparing our order almost instinctively.
 
 One manager even asked for a picture with us.
 
-Honestly?  
-Worth every line of code we mangled.
+Honestly? It was worth every single line of code we wrote.
