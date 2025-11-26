@@ -14,7 +14,9 @@ import { SafeVideo } from "../components/safe-video";
 
 ## Introduction
 
-In this post, I’ll guide you through my journey of setting up a neural network (NN) capable of simulating **Mario Kart** gameplay, frame by frame, based on the previous frame and a steering input (left or right). This was achieved **without embedding traditional game logic into the code**. Let's dive into the inspiration, technical challenges, and final implementation of this ambitious project.
+In this post, I’ll guide you through my journey of setting up a neural network (NN) capable of simulating **Mario Kart** gameplay, frame by frame, based on the previous frame and a steering input (left or right).
+
+This was achieved **without embedding traditional game logic into the code**. Let's dive into the inspiration, technical challenges, and final implementation of this ambitious project.
 
 <div className="text-ebony-clay-50 flex flex-wrap gap-1 w-full">
   <Shield
@@ -139,7 +141,6 @@ Understanding the dataset format is critical to training the NN. The DIAMOND mod
    `frame_<N>_x` (image data) and `frame_<N>_y` (input data), where `N` is the frame number (0-999 per file).
 2. **Image Data** (`_x`):  
    Each frame is stored as a 3D array with dimensions `(240 x 320 x 3)`:
-
    - `240 x 320`: Height and width.
    - `3`: RGB color channels.  
      _(Note: Height and width often swap during tensor conversion—an issue you’ll need to debug when preprocessing.)_
@@ -273,7 +274,6 @@ To train the DIAMOND model effectively, the dataset needed to include diverse sc
 
 1. **Noised Data**:  
    Introduced randomness to the steering values produced by NeuralKart, simulating a range of driving behaviors. For example, the AI might randomly steer slightly left when it would normally go straight.
-
    - Purpose: Teach the model to generalize better and handle edge cases.
 
 2. **Expert Data**:  
@@ -330,12 +330,10 @@ With the dataset prepared, the next step was to train DIAMOND to interpret the d
 DIAMOND’s training framework requires data preprocessing to convert the raw HDF5 files into a format suitable for training. This step involves modifying the `process_csgo_tar_files.py` script from the DIAMOND repository. By inspecting the provided [**`GitHub commit`**](https://github.com/Dere-Wah/AI-MarioKart64/commit/66edbe55efe3872235ed79cdbbebae628388e0f8), I made the following adjustments:
 
 1. **Update Data Paths**:
-
    - Modify the script to read HDF5 files from the `MK64AI_dataset` directory.
    - Ensure it processes image data (`X`) and corresponding steering vectors (`Y`).
 
 2. **Resolution Scaling**:
-
    - Ensure that data preprocessing maintains consistency between low-resolution (64x48) and full-resolution (320x240) inputs.
 
 3. **Output Directory**:
@@ -350,7 +348,6 @@ DIAMOND’s training framework requires data preprocessing to convert the raw HD
 DIAMOND’s training configuration required several adjustments to support Mario Kart 64 instead of CSGO. Here’s how I adapted the key configuration files:
 
 1. **`config/agent/csgo.yaml`**:
-
    - **Upsampling Factor**:
      - For 320x240 full-resolution and 64x48 low-resolution data, the **upsampling factor** remained `5` (`320/64 = 5`).
      - If resolutions differ, calculate the factor accordingly.
@@ -361,7 +358,6 @@ DIAMOND’s training configuration required several adjustments to support Mario
      ```
 
 2. **`config/env/csgo.yaml`**:
-
    - **Input Resolution**:
      - Update the `size` field to `[320, 240]` for full resolution.
      - Ensure the order matches the input data (`width` x `height`).
@@ -371,9 +367,7 @@ DIAMOND’s training configuration required several adjustments to support Mario
      - Update `path_data_low_res` and `path_data_full_res` to point to the preprocessed datasets.
 
 3. **`config/trainer.yaml`**:
-
    - Adjust training parameters for both the **denoiser** and **upsampler**:
-
      - Reduce `steps_per_epoch` and increase flexibility for testing different configurations.
      - Example (Denoiser):
 
@@ -425,7 +419,6 @@ Training DIAMOND for Mario Kart 64 required careful optimization of batch sizes 
 The training is divided into two key components: the **Denoiser** and the **Upsampler**. Each of these components required separate optimization due to differences in data resolution and GPU memory requirements.
 
 1. **Denoiser**:
-
    - **Resolution**: 64x48 (low resolution).
    - **Optimal Batch Size**: **28** on a 40GB GPU.
    - **Gradient Accumulation Steps**: **6**.
@@ -450,7 +443,6 @@ The training is divided into two key components: the **Denoiser** and the **Upsa
 The training process required adjustments to the number of steps per epoch to control training duration and allow for iterative testing. These values were optimized based on your experimentation:
 
 1. **Denoiser**:
-
    - **Steps Per Epoch**: **100**.
    - **Epochs**: Configured for 6 epochs (\( 6 \times 100 = 600 \) steps in total).
    - **Initial Steps for First Epoch**: Set to match regular steps (\( 100 \)).
@@ -468,7 +460,6 @@ The training process required adjustments to the number of steps per epoch to co
 Managing GPU memory was crucial, especially for the upsampler, which handles larger inputs. During the first epoch, memory usage was observed to be lower than in subsequent epochs. To prevent crashes:
 
 - **Reserve Headroom**:
-
   - Avoided completely maxing out VRAM during the first epoch.
   - Allowed for memory spikes in later epochs.
 
@@ -480,7 +471,6 @@ Managing GPU memory was crucial, especially for the upsampler, which handles lar
 ## **Final Values for Training**
 
 - **Denoiser**:
-
   - Gradient Accumulation Steps: 6
   - Batch Size: 28
   - Steps Per Epoch: 100
@@ -543,7 +533,6 @@ To generate spawns for Mario Kart 64, we randomly select frames and actions from
 
 1. **Randomly Select Frames:**
    The starting frame is randomly chosen from the range `[0, 799]`, ensuring space for the next 200 frames. For each of the first four frames:
-
    - Extract the image and action data (`X` and `Y`) from the HDF5 file.
    - Generate the low-resolution version of the image by resizing it using bicubic interpolation.
    - Save both the full-res and low-res images.
@@ -655,7 +644,6 @@ This section involves customizing the environment to map your keyboard inputs to
 
 2. **Decimal to Vector and Vector to Decimal Functions**  
    These functions map a floating-point value (e.g., steering input) to a one-hot vector and back. Here's a closer look:
-
    - **`decimal_to_vector`**: Converts a decimal value (e.g., -1.0 to 1.0 for steering) into a one-hot vector of size `N_KEYS`.
 
      ```python
@@ -682,7 +670,6 @@ This section involves customizing the environment to map your keyboard inputs to
 
 3. **Encoding and Decoding Actions**  
    These functions translate between high-level `CSGOAction` objects and the action vectors used by the neural network.
-
    - **`encode_csgo_action`**  
      Converts user inputs into a vector. This function encodes keys, and if applicable, mouse movements. For a simplified setup without mouse inputs:
 
@@ -746,7 +733,6 @@ def encode_csgo_action(csgo_action: CSGOAction, device: torch.device) -> torch.T
 
 1. **Adjust Input Mapping to Match Your Game**  
    Map each key to a specific index in your action vector. For example:
-
    - `W` → Forward movement
    - `A` → Turn left
    - `D` → Turn right  
@@ -771,7 +757,6 @@ This section focuses on how the game generates `CSGOAction` objects and integrat
 ## Understanding the Workflow
 
 1. **World Model Environment (`./src/envs/world_model_env.py`)**
-
    - **`reset()` Function**:  
      This initializes the environment by calling `self.generator_init.send()`, which determines a new spawn point. It sets the high-resolution and low-resolution images (stored in `obs` and `act` variables) for processing.  
      HX and CX (used for reinforcement learning) can be ignored here, as they are not relevant in this version of the code.
@@ -780,11 +765,9 @@ This section focuses on how the game generates `CSGOAction` objects and integrat
      This function calculates the next observation, upsamples it, and interacts with the neural network. It serves as the interface between the environment and the `CSGOAction`.
 
 2. **Game Environment (`./src/game/playenv.py`)**
-
    - This file interacts with `world_model_env.py`, calling its `reset()` and `step()` functions to process game logic.
 
 3. **Key Event Handling (`./src/game/game.py`)**
-
    - This is where `pygame` captures player inputs. In the `run()` function:
      - `pygame.KEYDOWN` adds pressed keys to the `keys_pressed` list.
      - `pygame.KEYUP` removes released keys from the `keys_pressed` list.
