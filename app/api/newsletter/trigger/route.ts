@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 
     // 5. Send email using Resend
     const emailResult = await resend.emails.send({
-      from: "projects@derewah.dev",
+      from: "projects@news.derewah.dev",
       to: randomUser.email,
       subject: project.frontmatter.title,
       html: newsletterHtml,
