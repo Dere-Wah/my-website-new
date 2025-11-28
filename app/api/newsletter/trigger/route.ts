@@ -20,9 +20,6 @@ export async function GET(request: NextRequest) {
         { error: "Failed to fetch latest project" },
         {
           status: 500,
-          headers: {
-            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
-          },
         }
       );
     }
@@ -42,9 +39,6 @@ export async function GET(request: NextRequest) {
         { error: "Database error" },
         {
           status: 500,
-          headers: {
-            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
-          },
         }
       );
     }
@@ -54,9 +48,6 @@ export async function GET(request: NextRequest) {
         { message: "Completed." },
         {
           status: 200,
-          headers: {
-            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
-          },
         }
       );
     }
@@ -72,9 +63,6 @@ export async function GET(request: NextRequest) {
         { error: "Project not found" },
         {
           status: 404,
-          headers: {
-            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
-          },
         }
       );
     }
@@ -91,9 +79,6 @@ export async function GET(request: NextRequest) {
         { error: "Failed to generate HTML." },
         {
           status: 500,
-          headers: {
-            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
-          },
         }
       );
     }
@@ -114,9 +99,6 @@ export async function GET(request: NextRequest) {
         { error: "Failed." },
         {
           status: 500,
-          headers: {
-            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
-          },
         }
       );
     }
@@ -139,9 +121,6 @@ export async function GET(request: NextRequest) {
       },
       {
         status: 200,
-        headers: {
-          "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
-        },
       }
     );
   } catch (error) {
@@ -150,9 +129,6 @@ export async function GET(request: NextRequest) {
       { error: "Internal server error" },
       {
         status: 500,
-        headers: {
-          "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
-        },
       }
     );
   }
