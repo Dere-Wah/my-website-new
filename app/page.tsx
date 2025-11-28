@@ -1,6 +1,7 @@
 import HeroSection from "@/components/hero-section";
 import About from "@/components/about";
 import ProjectsSection from "@/components/projects-section";
+import { NewsletterSignup } from "@/components/newsletter-signup";
 import { getProjects } from "@/lib/mdx";
 import { v4 as uuidv4 } from "uuid";
 
@@ -43,12 +44,15 @@ export const metadata = {
 export default async function Home() {
   const projects = await getProjects();
   return (
-    <div className="container max-w-3xl mx-auto px-4">
-      <div className="space-y-2">
-        <HeroSection />
-        <About />
-        <ProjectsSection projects={projects} />
+    <div className="container mx-auto">
+      <div className="max-w-3xl px-4 px-4 mx-auto">
+        <div className="space-y-2">
+          <HeroSection />
+          <About />
+          <ProjectsSection projects={projects} />
+        </div>
       </div>
+      <NewsletterSignup />
     </div>
   );
 }

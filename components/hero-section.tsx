@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import SocialLinks from "./social-links";
 import { motion } from "framer-motion";
 import Greeting from "./greeting";
+import { useEffect } from "react";
 
 const container = {
   hidden: { opacity: 0 },
@@ -29,6 +30,15 @@ const item = {
 };
 
 export default function HeroSection() {
+  useEffect(() => {
+    fetch("/api/newsletter/trigger", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }, []);
+
   return (
     <section className="pt-24 md:pt-32">
       <motion.div

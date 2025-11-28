@@ -18,7 +18,12 @@ export async function GET(request: NextRequest) {
     if (!recentProjectResponse.ok) {
       return NextResponse.json(
         { error: "Failed to fetch latest project" },
-        { status: 500 }
+        {
+          status: 500,
+          headers: {
+            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
+          },
+        }
       );
     }
 
@@ -33,13 +38,26 @@ export async function GET(request: NextRequest) {
 
     if (fetchError) {
       console.error("Database fetch error:", fetchError);
-      return NextResponse.json({ error: "Database error" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Database error" },
+        {
+          status: 500,
+          headers: {
+            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
+          },
+        }
+      );
     }
 
     if (!eligibleUsers || eligibleUsers.length === 0) {
       return NextResponse.json(
-        { message: "No eligible users to send newsletter to" },
-        { status: 200 }
+        { message: "Completed." },
+        {
+          status: 200,
+          headers: {
+            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
+          },
+        }
       );
     }
 
@@ -50,7 +68,15 @@ export async function GET(request: NextRequest) {
     // 3. Get the project details for the email subject
     const project = await getProjectBySlug(latestProjectName);
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Project not found" },
+        {
+          status: 404,
+          headers: {
+            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
+          },
+        }
+      );
     }
 
     // 4. Get the HTML content from the newsletter endpoint
@@ -62,8 +88,13 @@ export async function GET(request: NextRequest) {
 
     if (!newsletterResponse.ok) {
       return NextResponse.json(
-        { error: "Failed to generate newsletter HTML" },
-        { status: 500 }
+        { error: "Failed to generate HTML." },
+        {
+          status: 500,
+          headers: {
+            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
+          },
+        }
       );
     }
 
@@ -80,8 +111,13 @@ export async function GET(request: NextRequest) {
     if (emailResult.error) {
       console.error("Resend error:", emailResult.error);
       return NextResponse.json(
-        { error: "Failed to send email" },
-        { status: 500 }
+        { error: "Failed." },
+        {
+          status: 500,
+          headers: {
+            "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
+          },
+        }
       );
     }
 
@@ -99,18 +135,25 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: "Newsletter sent successfully",
-        recipient: randomUser.email,
-        project: latestProjectName,
-        emailId: emailResult.data?.id,
+        message: "Completed.",
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
+        },
+      }
     );
   } catch (error) {
     console.error("Newsletter trigger error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "public, max-age=3600, s-maxage=3600", // 1 hour cache
+        },
+      }
     );
   }
 }
