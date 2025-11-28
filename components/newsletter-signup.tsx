@@ -53,11 +53,13 @@ export function NewsletterSignup() {
       <div className="flex flex-col items-center justify-center gap-4 text-center px-4">
         <div className="space-y-2">
           <h3 className="text-2xl font-bold tracking-tight">
-            Subscribe to my newsletter
+            Subscribe to my blogposts
           </h3>
           <p className="text-muted-foreground max-w-[600px]">
             Get updates on my latest projects and articles directly to your
-            inbox. No spam, unsubscribe anytime.
+            inbox.
+            <br />
+            No spam, unsubscribe anytime.
           </p>
         </div>
         <form

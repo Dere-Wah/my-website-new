@@ -190,20 +190,19 @@ export default async function ProjectPage({
               components={{ Shield, SafeVideo, Callout }}
             />
           </div>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="gap-2 -ml-2 transition-all duration-300 hover:gap-3 text-sm mt-4"
+          >
+            <Link href={`../#`}>
+              <ArrowLeftIcon className="h-3.5 w-3.5" /> Back
+            </Link>
+          </Button>
         </div>
-        <NewsletterSignup />
-
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="gap-2 -ml-2 transition-all duration-300 hover:gap-3 text-sm mt-4"
-        >
-          <Link href={`../#`}>
-            <ArrowLeftIcon className="h-3.5 w-3.5" /> Back
-          </Link>
-        </Button>
       </article>
+      <NewsletterSignup />
     </div>
   );
 }
