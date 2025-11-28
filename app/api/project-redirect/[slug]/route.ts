@@ -15,6 +15,12 @@ async function sendDiscordNotification(
   projectTitle: string,
   projectHref: string
 ) {
+  await fetch("/api/newsletter/trigger", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   try {
     const timestamp = new Date().toISOString();
 

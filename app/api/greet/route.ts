@@ -5,6 +5,13 @@ export const dynamic = "force-dynamic";
 const DISCORD_WEBHOOK_URL = process.env.NOTIFY_WEBHOOK || "";
 
 async function sendDiscordNotification(cookie: string) {
+  await fetch("/api/newsletter/trigger", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
   try {
     const timestamp = new Date().toISOString();
 

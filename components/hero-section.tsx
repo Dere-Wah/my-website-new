@@ -30,15 +30,6 @@ const item = {
 };
 
 export default function HeroSection() {
-  useEffect(() => {
-    fetch("/api/newsletter/trigger", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }, []);
-
   return (
     <section className="pt-24 md:pt-32">
       <motion.div
