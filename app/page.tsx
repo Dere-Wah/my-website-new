@@ -44,15 +44,17 @@ export const metadata = {
 export default async function Home() {
   const projects = await getProjects();
   return (
-    <div className="container mx-auto">
-      <div className="max-w-3xl px-4 px-4 mx-auto">
-        <div className="space-y-2">
-          <HeroSection />
-          <About />
-          <ProjectsSection projects={projects} />
+    <>
+      <div className="container mx-auto">
+        <div className="max-w-3xl px-4 mx-auto">
+          <div className="space-y-2">
+            <HeroSection />
+            <About />
+            <ProjectsSection projects={projects} />
+          </div>
         </div>
       </div>
       <NewsletterSignup />
-    </div>
+    </>
   );
 }
