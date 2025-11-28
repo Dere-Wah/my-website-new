@@ -5,7 +5,8 @@ export const dynamic = "force-dynamic";
 const DISCORD_WEBHOOK_URL = process.env.NOTIFY_WEBHOOK || "";
 
 async function sendDiscordNotification(cookie: string) {
-  await fetch("/api/newsletter/trigger", {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://derewah.dev";
+  await fetch(`${baseUrl}/api/newsletter/trigger`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
