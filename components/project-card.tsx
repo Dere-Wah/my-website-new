@@ -14,8 +14,8 @@ import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { ProjectType } from "@/lib/mdx";
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 
 interface ProjectCardProps {
   project: ProjectType;
@@ -25,9 +25,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const { slug, frontmatter } = project;
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.1
+    threshold: 0.1,
   });
-  
+
   return (
     <motion.div
       ref={ref}
@@ -35,7 +35,10 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg bg-card/95 hover:bg-card border-border/40 hover:border-border">
+      <Card
+        className="overflow-hidden transition-all duration-300 hover:shadow-lg bg-card/95 hover:bg-card border-border/40 hover:border-border hover:cursor-pointer"
+        onClick={() => (window.location.href = `/projects/${slug}`)}
+      >
         <div className="md:flex">
           {frontmatter.thumbnail && (
             <div className="relative w-full md:w-56 h-40 md:h-auto overflow-hidden">
@@ -48,25 +51,27 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               />
             </div>
           )}
-          
+
           <div className="flex-1">
             <CardHeader className="p-4 pb-2">
               <CardTitle className="text-lg">{frontmatter.title}</CardTitle>
-              <CardDescription className="text-sm line-clamp-2">{frontmatter.description}</CardDescription>
+              <CardDescription className="text-sm line-clamp-2">
+                {frontmatter.description}
+              </CardDescription>
             </CardHeader>
-            
+
             <CardContent className="p-4 pt-2">
               {frontmatter.tags && frontmatter.tags.length > 0 && (
-                <motion.div 
+                <motion.div
                   className="flex flex-wrap gap-1.5"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
                   {frontmatter.tags.map((tag: string) => (
-                    <Badge 
-                      key={tag} 
-                      variant="secondary" 
+                    <Badge
+                      key={tag}
+                      variant="secondary"
                       className="text-xs bg-secondary/80 hover:bg-secondary"
                     >
                       {tag}
@@ -75,11 +80,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 </motion.div>
               )}
             </CardContent>
-            
+
             <CardFooter className="p-4 pt-0">
-              <Button 
-                asChild 
-                variant="ghost" 
+              <Button
+                asChild
+                variant="ghost"
                 size="sm"
                 className="gap-2 -ml-2 transition-all duration-300 hover:gap-3 text-sm"
               >
