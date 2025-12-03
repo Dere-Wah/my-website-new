@@ -7,8 +7,9 @@ tags: ["Bots", "Social Experiment"]
 thumbnail: "/assets/blog/polimeet/thumbnail.png"
 published: true
 ---
-import { Shield } from "../components/ui/shield";
 
+import { Shield } from "../components/ui/shield";
+import { NewsletterCard } from "../components/newsletter-card";
 
 ![A version of the sticker we put in bathrooms.](/assets/blog/polimeet/banner.png)
 
@@ -27,6 +28,8 @@ I thought, "Why not take this idea and adapt it specifically for our university 
 ![The greeting message (italian).](/assets/blog/polimeet/welcome.png)
 
 ---
+
+<NewsletterCard />
 
 ## Getting Started: The Technical Foundation
 
@@ -82,7 +85,7 @@ I was not surprised that the most used flyer was the "bathroom" one.
 
 Once the flyers and stickers were up, we started seeing activity on the bot. While we couldn’t monitor conversations for privacy reasons, we received notifications when someone started the bot, along with the location tied to their QR code.
 
-After a few days, our project caught the attention of a university association called PoliNetwork. Anna had shared the bot link in one of their large Telegram groups, and one of the admins reached out to her. 
+After a few days, our project caught the attention of a university association called PoliNetwork. Anna had shared the bot link in one of their large Telegram groups, and one of the admins reached out to her.
 
 The three of us were invited to a discussion group where PoliNetwork members mentioned they’d had a similar idea — jokingly called "PoliTinder" — but we were the first to actually build something. They even offered to review our code and potentially integrate the bot with their network to make it a more widely-used service.
 
@@ -97,7 +100,15 @@ What we take away from this experience is invaluable: the importance of version 
 PoliMeet may not have become the next big thing on campus, but it taught us some key lessons about teamwork, resilience, and the ups and downs of amateur projects.
 
 Other members involved:
-<Shield icon="mdi:github" url="https://github.com/agent-png">Jack</Shield>
-<Shield icon="skill-icons:linkedin" url="https://www.linkedin.com/in/anna-mettifogo-a37751292/">Anna</Shield>
+
+<Shield icon="mdi:github" url="https://github.com/agent-png">
+  Jack
+</Shield>
+<Shield
+  icon="skill-icons:linkedin"
+  url="https://www.linkedin.com/in/anna-mettifogo-a37751292/"
+>
+  Anna
+</Shield>
 
 ---

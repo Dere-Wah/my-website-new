@@ -7,7 +7,9 @@ tags: ["AI", "Youtube"]
 published: true
 thumbnail: "/assets/blog/ai-shorts/thumbnail1.png"
 ---
+
 import { Shield } from "../components/ui/shield";
+import { NewsletterCard } from "../components/newsletter-card";
 
 ![An example of an uploaded video](/assets/blog/ai-shorts/yt_banner.jpg)
 
@@ -25,11 +27,16 @@ I've seen tons and tons of attempts at AI generated content, and had already tho
 I decided to take this as an opportunity to actually dip my hands into this type of projects, so we hopped on a call and started brainstorming an approach to the problem. In the end, we settled
 for a generator that would fetch a specific pair of Post & Reply from the popular sub r/AskReddit, and generate a youtube short ready for upload.
 
-
 _This wasn't going to be easy._
 
 ---
+
+<NewsletterCard />
+
+---
+
 # How do you go from a Reddit Post to a Youtube Short?
+
 ![Our first logic map of the generator.](/assets/blog/ai-shorts/project.png)
 Converting from a text document to a well-edited & subtitled video is no easy task. Let's think about this problem, and break it up in single stepts that
 a computer would need to do to accomplish this goal. First of all, we need to access reddit.
@@ -65,12 +72,12 @@ We felt that the number of upvotes & comments wasn't a really necessary detail, 
 ---
 
 # How Did We Generate The Voice?
+
 As we moved forward, the next challenge was to generate a voiceover
 for our video that would resonate with viewers. We aimed to mimic that
 distinctive TikTok female voice, which had become synonymous with viral content.
 Unfortunately, after scouring various TTS (Text-to-Speech) services, we realize
 that none offered an affordable or even remotely accurate replication of that voice.
-
 
 Just when we were about to give up, I stumbled upon a website that used the exact voice
 we were looking for. This site exposed an API that allowed users to generate voice samples.
@@ -81,18 +88,19 @@ _As of right now, the [API](https://github.com/Weilbyte/tiktok-tts) we used does
 There was a catch, though: the API had limitations on the length of the text it could process in one go.
 To work around this, I implemented a function that intelligently split the text into smaller chunks.
 Each chunk was carefully crafted to stay within the maximum allowed length, ensuring that the voice generation would not be cut off abruptly.
-These chunks were then processed individually, and the resulting audio files were stored in a specific folder structure: 
+These chunks were then processed individually, and the resulting audio files were stored in a specific folder structure:
 
 `./generated/<reddit_post_id>-<unix_date>/`
 Within this folder, we stored both the thumbnail and the audio files.
 The audio files were named sequentially, like sample1.wav, sample2.wav, and so on, to keep everything organized and easily accessible
- With this setup, we could efficiently manage and retrieve the assets needed for each video.
+With this setup, we could efficiently manage and retrieve the assets needed for each video.
 
 ![File system.](/assets/blog/ai-shorts/file_system.png)
 
 ---
 
 # Synchronizing Subtitles with the Voice
+
 Once we had our audio files, the next step was to generate accurate subtitles.
 To achieve this, we merged all the audio samples into a single file, which allowed us to have one continuous voiceover.
 The key to creating engaging subtitles is precise timing, so we turned to OpenAI's Whisper model for this task.
@@ -101,13 +109,13 @@ Whisper has a word-by-word mode that generates timing data for each spoken word,
 We fed the combined audio file into Whisper, and it produced a detailed transcription along with timestamps for each word.
 This data was critical for the next phase of our project: creating animated subtitles.
 
-
 By having exact timings, we could ensure that each word appeared on screen at the perfect moment,
 enhancing the overall viewer experience and making the video more dynamic.
 
 ---
 
 # Ensuring Audio Length and Segmenting for Whisper
+
 Thanks to the calculations we performed earlier, we were confident that the audio length stayed within the API's limits.
 
 Moreover, we noticed that OpenAI's Whisper model, which we would use for Text Timing Generation, was more effective with short segments of words rather than a long single audio file.
@@ -144,7 +152,9 @@ However, the challenge was that each timing was relative to the start of each in
 As shown above, each word group has a start and end value. With multiple audio segments, we needed to create a function that would offset each word group to its correct position within the entire audio duration, accounting for the segments that preceded it.
 
 ---
+
 # Generating Subtitles with Procedural Animations
+
 Now that we had a detailed JSON of all this information, the next step was to generate subtitles. Instead of adding standard subtitles, we wanted to incorporate procedural animations.
 
 To achieve this, I decided to use a file format called "ASS" (SubStation Alpha). This format allows for animations in each subtitle line based on timestamps, and it can be read by FFMPEG to render these subtitles onto the video.
@@ -169,6 +179,7 @@ Style: en_us_002, Dosis-Bold,30,&H00D4F6FA,&H00FFFFFF,&H00303030,&H80000008,0,0,
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 ```
+
 In the style definition, you'll notice there are multiple variants with different colors and names. This assured that based on the voice that was going to read the text, we had a different subtitle color. This is really important for the clarity of the video, and add some variation to it.
 
 Here’s a glimpse of our `ConvertToAss` function. This function iterates through the `verbose_json` generated by Whisper earlier, processing each word group.
@@ -204,10 +215,10 @@ def convert_to_ass(words, folder):
 The resulting file is something like this:
 ![Our subtitles.ass file.](/assets/blog/ai-shorts/result.png)
 
-
 ---
 
 # Putting It All Together
+
 With the audio and subtitle file prepared, we used a specific function within FFMPEG to merge them, resulting in a video with synchronized audio and animated subtitles.
 
 For the background, we selected pre-existing videos that are known to go viral on platforms like TikTok—things like GTA 5 ramps or races, Minecraft parkour, pressure washing, or bike downhill riding. These types of content are engaging yet non-distracting, keeping the viewer's eyes focused on the video.
@@ -219,6 +230,7 @@ Finally, we added some generic background music, and that was it! We successfull
 ---
 
 # Expanding the Project: Moving to Telegram
+
 After we finished the initial bot, I realized I wasn't quite satisfied and wanted to take it a step further by moving the entire interface to a Telegram bot.
 
 ![The BOT interface, using Telegram Threads](/assets/blog/ai-shorts/tg_interface.png)
@@ -231,7 +243,6 @@ I developed a bot that monitored any links sent in a specific chat. For each lin
 
 **Post & Top Comments**: The bot would generate the title and thumbnail, then loop through the top comments. It would ask ChatGPT to rate each comment in terms of length, interest, and relevance, selecting the best three or four. The bot would then concatenate different voices, each with distinct subtitle colors, to read these texts sequentially.
 
-
 ![Generation Options](/assets/blog/ai-shorts/tg_menu.png)
 
 Interestingly, the "Post" feature became our most used. We found it to be the most effective, as the "Post & Top Comments" option sometimes produced videos that were too long for YouTube Shorts. Additionally, it could be difficult to distinguish when one comment ended and another began, making the video less engaging.
@@ -239,6 +250,7 @@ Interestingly, the "Post" feature became our most used. We found it to be the mo
 ---
 
 # Automation and Review Process
+
 Once a post was selected, the bot ran the entire process from start to finish, then sent the video back to us on Telegram in a designated pending-videos channel. This allowed us to review the generated videos and manually decide if they were good enough for upload. We could approve or reject each video. If a video was rejected, it would be deleted. Approved videos were sent to a queue folder, which would then be processed for automatic YouTube upload.
 
 ![Approving a rendered video.](/assets/blog/ai-shorts/tg_approval.png)
@@ -251,6 +263,7 @@ Finally, we set up an "uploaded-videos" channel to notify us of every single upl
 ---
 
 # The Hardcode Feature and Exploring New Possibilities
+
 Not one to stop there, I added a feature that allowed us to "Hard Code" posts. This enabled us to generate videos not based on a Reddit link, but on a custom set of author, subreddit, title, and selftext combinations. For example, a command could look like this:
 
 ```
@@ -268,6 +281,7 @@ I even explored the idea of using this feature for advertising. I could craft st
 ---
 
 # Autogenerate: Full Automation
+
 The last twist I added to the Telegram bot was an /autogenerate command, which fully automated the video creation process. I could generate posts and captions using ChatGPT and then paste them into my /hardcode command, but I wanted to eliminate even those steps. The /autogenerate command took care of everything:
 
 ```
@@ -304,9 +318,10 @@ Sometimes, the most hurtful words can be the biggest motivation to succeed.
 
 While these auto-generated stories were not always the most original or interesting, and thus the feature wasn’t used extensively, it still added a layer of automation that could be handy in specific scenarios.
 
-
 ---
+
 # Conclusions and going forward
+
 After we finished developing the bot, we put it online on a server and used it consistently for a couple of months. The bot was uploading content on a 6-hour basis, and we were constantly generating new videos for it. You can find the videos in the Shorts section of this YouTube channel: [**@DereDev**](https://www.youtube.com/@deredev4179/shorts).
 Some videos even went "a little bit" viral, reaching up to 7,200 views, like [**this one**](https://www.youtube.com/shorts/eaL8Rur6Spg).
 

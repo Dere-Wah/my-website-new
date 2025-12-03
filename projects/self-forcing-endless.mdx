@@ -7,9 +7,11 @@ published: true
 thumbnail: "https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/thumbnail.png?raw=true"
 video_thumbnail: "https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/demo.mp4?raw=true"
 ---
+
 import { Shield } from "../components/ui/shield";
 import { SafeVideo } from "../components/safe-video";
 import { Callout } from "../components/ui/callout";
+import { NewsletterCard } from "../components/newsletter-card";
 
 Generative video models have advanced rapidly in recent years, and among the many approaches, one stands out for how it works rather than how it looks: Self-Forcing.
 
@@ -19,7 +21,7 @@ For background, see the <Shield icon="mdi:web" href="https://self-forcing.github
 
 This post builds on that architecture, and all additions here are open-sourced at the <Shield icon="mdi:github" href="https://github.com/Dere-Wah/Self-Forcing-Endless" text="Self-Forcing-Endless" /> repository.
 
----
+<NewsletterCard />
 
 ## Self-Forcing: Let’s Make It Endless
 
@@ -30,23 +32,26 @@ My goal was straightforward: take the existing inference loop, **hack it to "wra
 ![The idea behind all of this](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/1.png?raw=true)
 
 <Callout emoji="💡">
-This scheme only briefly covers the architecture of Self-Forcing. As the BlogPost goes in deeper in the details of the changes I applied, each specific step will be explained and covered more precisely.
+  This scheme only briefly covers the architecture of Self-Forcing. As the
+  BlogPost goes in deeper in the details of the changes I applied, each specific
+  step will be explained and covered more precisely.
 </Callout>
 
 The original paper gave a subtle but important clue: it mentioned that longer generations had been tested, but the quality degraded over time. This was a huge hint. It meant that endless generation was **possible**, even if it came with challenges.
 
 <div className="flex flex-wrap justify-center gap-0.5">
-    <SafeVideo
-            src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/2.mp4?raw=true"
-            className="justify-center"
-            autoPlay
-            loop
-            muted
-            playsInline
-        />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/2.mp4?raw=true"
+    className="justify-center"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
 </div>
 <Callout emoji="💡">
-The video accumulates errors over time, and these stack up and become more evident as time goes on.
+  The video accumulates errors over time, and these stack up and become more
+  evident as time goes on.
 </Callout>
 
 After a few days of diving into the code, I managed to get it working. The trick? Take the last generated **frame**, reset the model, and kick off a new generation loop using that frame instead of starting from scratch. Skip the first generation step, and boom. Endless video!
@@ -54,25 +59,28 @@ After a few days of diving into the code, I managed to get it working. The trick
 What's even better is that the results matched the paper’s findings. After about 30 seconds of continuous generation, things started to fall apart: colors became overly saturated, movement patterns looped unnaturally, and the animation lost its realism.
 
 <div className="flex flex-col md:flex-row justify-center items-center gap-0.5">
-    <SafeVideo
-        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/3.mp4?raw=true"
-        className="justify-center"
-        autoPlay
-        loop
-        muted
-        playsInline
-        controls
-    />
-    <div>
-        ![Pure nightmare fuel](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/4.png?raw=true)
-    </div>
-    <div>
-        ![Pure nightmare fuel](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/5.png?raw=true)
-    </div>
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/3.mp4?raw=true"
+    className="justify-center"
+    autoPlay
+    loop
+    muted
+    playsInline
+    controls
+  />
+  <div>
+    ![Pure nightmare
+    fuel](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/4.png?raw=true)
+  </div>
+  <div>
+    ![Pure nightmare
+    fuel](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/5.png?raw=true)
+  </div>
 </div>
 
 <Callout emoji="💡">
-My results, after getting the model to infinitely generate. Pure nightmare fuel.
+  My results, after getting the model to infinitely generate. Pure nightmare
+  fuel.
 </Callout>
 
 Another issue I noticed happening inside of the generated videos, was a constant flicker, happening periodically every ~1 second. This flicker was really unnatural and I wanted to fix it, since it didn’t seem to happen in the original paper results.
@@ -89,16 +97,18 @@ Let’s break it down. The model operates in latent space. This means the whole 
 
 But since this **latent space** is not made for humans, we can't just look at it and appreciate it. We need an intermediate step.
 
- To translate our images into these latents, we use VAEs. Think of VAEs as the portal to the AI dimension.
+To translate our images into these latents, we use VAEs. Think of VAEs as the portal to the AI dimension.
 
 In this specific case, Self-Forcing VAE's:
+
 - Compresses multiple temporally nearby frames together into a single latent
 - Uses a memory system (a VAE cache) to maintain consistency between nearby latents.
 
 <div className="flex flex-row justify-center">
-    <div className="md:w-1/2">
-        ![The VAE Encoding method, with memory](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/vae.png?raw=true)
-    </div>
+  <div className="md:w-1/2">
+    ![The VAE Encoding method, with
+    memory](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/vae.png?raw=true)
+  </div>
 </div>
 
 The catch? Exactly that memory. When I reset the model and restarted the generation without preserving it, in latent space the frames were fine, but when they were being moved through the VAE, they were missing the context of the previous frames stored in the cache.
@@ -128,17 +138,18 @@ As more time passes and more frames get generated, latents start to accumulate e
 
 ## Real-Time Conditioning
 
-My first idea was to **change the prompt on the fly** as the video began to degrade. What if I could shift the condition to something entirely new, or even design it to **counteract the drift**? Even if it didn’t completely solve the problem, adding a way to *steer* the endless video in real time seemed too good not to try.
+My first idea was to **change the prompt on the fly** as the video began to degrade. What if I could shift the condition to something entirely new, or even design it to **counteract the drift**? Even if it didn’t completely solve the problem, adding a way to _steer_ the endless video in real time seemed too good not to try.
 
 The implementation was straightforward. During inference, I made it possible to update the prompt instantly, replacing the old condition with a new one in the very next generation cycle.
 
-Technically, it worked. The model responded to changes, and the scene updated in real time. However, this didn't help solving the degradation problem. 
+Technically, it worked. The model responded to changes, and the scene updated in real time. However, this didn't help solving the degradation problem.
 
 <Callout emoji="💡">
 Even using a prompt as specific as
 > "When the scene looks like a picasso painting, with oversaturated colors and unrealistic shapes, smoothly zoom out of it and bring it back to a realistic style"
 
- didn't help.
+didn't help.
+
 </Callout>
 
 ---
@@ -163,28 +174,30 @@ Technically, the purge worked perfectly. The results, however, varied:
 - And sometimes it hit the ideal balance: a refreshed, high-quality frame sequence that still felt coherent.
 
 <div className="flex flex-col md:flex-row items-center">
-    <SafeVideo
-        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/7.mp4?raw=true"
-        className="md:w-1/2 justify-center"
-        autoPlay
-        loop
-        muted
-        playsInline
-        controls
-    />
-    <SafeVideo
-        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/8.mp4?raw=true"
-        className="md:w-1/2 justify-center"
-        autoPlay
-        loop
-        muted
-        playsInline
-        controls
-    />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/7.mp4?raw=true"
+    className="md:w-1/2 justify-center"
+    autoPlay
+    loop
+    muted
+    playsInline
+    controls
+  />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/8.mp4?raw=true"
+    className="md:w-1/2 justify-center"
+    autoPlay
+    loop
+    muted
+    playsInline
+    controls
+  />
 </div>
 
 <Callout emoji="💡">
-Here are some of the best results from the cache purge trick. As you can see, it is both possible to change what is happening in the scene smoothly, (1) and also recover from degradation. (2)
+  Here are some of the best results from the cache purge trick. As you can see,
+  it is both possible to change what is happening in the scene smoothly, (1) and
+  also recover from degradation. (2)
 </Callout>
 
 The method clearly worked, but the unpredictability left me wondering: **why was it so inconsistent?**
@@ -196,7 +209,6 @@ The method clearly worked, but the unpredictability left me wondering: **why was
 Then one of our team members had a breakthrough thought:
 
 > "Maybe it's a concurrency issue?"
-> 
 
 That was it.
 
@@ -205,7 +217,6 @@ The generator doesn’t spit out a frame instantly. Each block goes through four
 In the early passes, the noise is strong and affects the broad strokes: the overall shapes, layout, and motion in the scene. Later passes target finer details: textures, small motions, and subtle transitions. Think of it like sculpting: first you rough out the block of marble, then you refine the contours, then you polish.
 
 This process is guided by the KV cache (keys and values in the model’s attention layers). The cache is the model’s “memory”: it stores the features of past frames so the next block can stay consistent with what came before. Without it, the model would start from scratch each time.
-
 
 ![The denoising process](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/9.png?raw=true)
 
@@ -221,25 +232,29 @@ Once I saw this, the fix was obvious: add a parameter to choose exactly when the
 
 ## Best Use Cases for Cache Purge
 
-After a *lot* of experimentation, I finally figured out the most effective ways to use the cache purge feature.
+After a _lot_ of experimentation, I finally figured out the most effective ways to use the cache purge feature.
 
 The first and simplest use case is when **generation starts to drift**. Colors oversaturate, motion becomes unnatural, or details begin to fall apart. In that case, triggering a cache purge helps **recover image quality**, though it comes at the cost of some temporal consistency with the previous frames.
 
 The second, and arguably most powerful, use case is to **perform a purge right after changing the prompt**. This is crucial because even after updating the prompt, the model continues denoising using the previous memory and condition. Without a purge, the new prompt is "blended" with remnants of the old scene.
 
 <div className="flex flex-row justify-center">
-    <SafeVideo
-        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/11.mp4?raw=true"
-        className=" justify-center"
-        autoPlay
-        loop
-        muted
-        playsInline
-        controls
-    />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/11.mp4?raw=true"
+    className=" justify-center"
+    autoPlay
+    loop
+    muted
+    playsInline
+    controls
+  />
 </div>
 <Callout emoji="💡">
-For example, if the current scene shows a **cat**, and you suddenly switch the prompt to describe a **woman**, the step timing of the purge determines how fast and clearly the model adapts. The earlier in the denoising process you clear the cache, the more **reactive** the change, because there is more **random** noise not influenced by previous cache.
+  For example, if the current scene shows a **cat**, and you suddenly switch the
+  prompt to describe a **woman**, the step timing of the purge determines how
+  fast and clearly the model adapts. The earlier in the denoising process you
+  clear the cache, the more **reactive** the change, because there is more
+  **random** noise not influenced by previous cache.
 </Callout>
 
 ---
@@ -259,40 +274,38 @@ In this approach, you **completely change the prompt**. Then you let the model, 
 Let’s say your first prompt is:
 
 > “A WOMAN WALKING DOWN THE STREET”
-> 
 
 Then, mid-generation, you change it to:
 
 > “A CAT WALKING DOWN THE STREET”
-> 
 
 These prompts have very little in common, so what the model does is start to slowly morph the features of the woman into something cat-like. The transformation can be strange (eyes might shift, limbs may deform), and depending on the cache state and timing of the purge, the transition can take a while. It’s fascinating to watch, but not always clean.
 
 Using **Reactivity**, you can increase how quickly the change happens, but this comes at the cost of **temporal consistency**: the video may jump or lose smoothness.
 
 <div className="flex flex-col md:flex-row justify-center">
-    <SafeVideo
-        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/12.mp4?raw=true"
-        className="md:w-1/2 justify-center"
-        autoPlay
-        loop
-        muted
-        playsInline
-        controls
-    />
-    <SafeVideo
-        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/13.mp4?raw=true"
-        className="md:w-1/2 justify-center"
-        autoPlay
-        loop
-        muted
-        playsInline
-        controls
-    />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/12.mp4?raw=true"
+    className="md:w-1/2 justify-center"
+    autoPlay
+    loop
+    muted
+    playsInline
+    controls
+  />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/13.mp4?raw=true"
+    className="md:w-1/2 justify-center"
+    autoPlay
+    loop
+    muted
+    playsInline
+    controls
+  />
 </div>
 
 <Callout emoji="💡">
-In these 2 videos strength 0 and strength 1 are demonstrated.
+  In these 2 videos strength 0 and strength 1 are demonstrated.
 </Callout>
 
 In these videos, the “strength” value you see, is basically the inverse of the step at which you purge, The earlier you purge, (steps → 0) the stronger the transition is, so strength → 4.
@@ -315,13 +328,13 @@ With this method, the model understands the transition is intentional. The trans
 However, there’s a drawback: because the model doesn’t have a true long-term memory, it may **loop** the transformation. Even once the rocket has fully launched, the condition still says "THE ROCKET LAUNCHES", so it tries to do it again. You end up in an infinite cycle where the rocket keeps re-launching.
 
 <SafeVideo
-    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/repeating.mp4?raw=true"
-    className="justify-center"
-    autoPlay
-    loop
-    muted
-    playsInline
-    controls
+  src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/repeating.mp4?raw=true"
+  className="justify-center"
+  autoPlay
+  loop
+  muted
+  playsInline
+  controls
 />
 
 ---
@@ -337,26 +350,26 @@ So what if we could control that initial noise?
 Imagine this pipeline:
 
 1. Take a video.
-2. **Encode each frame into latent space.** (*)
-3. **Add noise** to those latents. (*)
+2. **Encode each frame into latent space.** (\*)
+3. **Add noise** to those latents. (\*)
 4. Feed them into the Self-Forcing denoising loop, using a **new text prompt**.
 5. Decode the result back into video frames.
 
-The parts marked with (*) are features that weren’t originally implemented in the Self-Forcing repo, and I had to implement them myself.
+The parts marked with (\*) are features that weren’t originally implemented in the Self-Forcing repo, and I had to implement them myself.
 
 ![Adding noise to a clean latent](https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/14.png?raw=true)
 
 I took a few days away from the main development and went deep into this idea. After a **lot** of iteration, I eventually got a rough prototype working.
 
 <div className="flex flex-col md:flex-row justify-center">
-    <SafeVideo
-        src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/v2v.mp4?raw=true"
-        className="justify-center"
-        autoPlay
-        loop
-        muted
-        playsInline
-    />
+  <SafeVideo
+    src="https://github.com/Dere-Wah/my-website-new/blob/main/private/assets/blog/self-forcing-endless/v2v.mp4?raw=true"
+    className="justify-center"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
 </div>
 
 You can now feed in an existing video, encode it to latent space, perturb it with noise, give it a new condition, and generate an **edited version** of the original. What’s wild is that it’s already **almost real-time**. With some clever engineering (e.g., using queues to pipe in frames during encoding), the performance is nearly on par with standard Self-Forcing generation.
@@ -379,9 +392,20 @@ Thanks for reading! This was a deep dive into Self-Forcing, endless generation, 
 
 If you want to share the project around, here are some links to do so!
 
-<Shield icon="mdi:reddit" href="https://www.reddit.com/r/StableDiffusion/comments/1mrtnr6/making_selfforcing_endless_restoring_from/" text="Reddit Post" />
+<Shield
+  icon="mdi:reddit"
+  href="https://www.reddit.com/r/StableDiffusion/comments/1mrtnr6/making_selfforcing_endless_restoring_from/"
+  text="Reddit Post"
+/>
 
-<Shield icon="fa6-brands:square-x-twitter" href="https://x.com/DereWah/status/1956060417244967261" text="X Post" />
+<Shield
+  icon="fa6-brands:square-x-twitter"
+  href="https://x.com/DereWah/status/1956060417244967261"
+  text="X Post"
+/>
 
-<Shield icon="mdi:linkedin" href="https://www.linkedin.com/posts/davide-locatelli-91a360304_what-if-ai-video-generation-never-had-to-activity-7361835692005437440-Xy5t" text="LinkedIn Post" />
-
+<Shield
+  icon="mdi:linkedin"
+  href="https://www.linkedin.com/posts/davide-locatelli-91a360304_what-if-ai-video-generation-never-had-to-activity-7361835692005437440-Xy5t"
+  text="LinkedIn Post"
+/>

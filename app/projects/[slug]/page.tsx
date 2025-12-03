@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import SafeVideo from "@/components/safe-video";
 import { NewsletterSignup } from "@/components/newsletter-signup";
+import NewsletterCard from "@/components/newsletter-card";
 
 export async function generateStaticParams() {
   const projects = await getProjects();
@@ -187,7 +188,14 @@ export default async function ProjectPage({
           >
             <MDXRemote
               source={content}
-              components={{ Shield, SafeVideo, Callout }}
+              components={{
+                Shield,
+                SafeVideo,
+                Callout,
+                NewsletterCard: (props: any) => (
+                  <NewsletterCard {...props} variant="inline" />
+                ),
+              }}
             />
           </div>
           <Button

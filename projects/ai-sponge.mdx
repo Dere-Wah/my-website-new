@@ -2,13 +2,22 @@
 title: "How I Built an AI-Generated Show"
 date: "2025-05-17"
 description: "A behind-the-scenes look at how I built an AI-generated livestream using Unity, GPT, and TTS to simulate Spongebob characters in surreal, user-driven episodes."
-tags: ["AI", "Livestreaming", "Unity", "GPT-4", "Text-to-Speech", "Procedural Generation"]
+tags:
+  [
+    "AI",
+    "Livestreaming",
+    "Unity",
+    "GPT-4",
+    "Text-to-Speech",
+    "Procedural Generation",
+  ]
 thumbnail: "/assets/blog/ai-sponge/thumbnail.png"
-published: true 
+published: true
 ---
+
 import { Callout } from "../components/ui/callout";
 import { Shield } from "../components/ui/shield";
-
+import { NewsletterCard } from "../components/newsletter-card";
 
 At the end of my first year in university, I remember opening YouTube and spotting a really strange livestream on the homepage.
 
@@ -18,7 +27,10 @@ The livestream was... _surreal_. It was a kind of simulation where Spongebob cha
 
 What stood out even more was the chat. It was constantly interacting with the stream, even suggesting new topics for episodes.
 
-<Callout emoji="💡">An episode was essentially a short scene, max 1 minute long, where characters discussed a topic in a humorous or completely unhinged way.</Callout>
+<Callout emoji="💡">
+  An episode was essentially a short scene, max 1 minute long, where characters
+  discussed a topic in a humorous or completely unhinged way.
+</Callout>
 
 The AI left plenty of amusing artifacts: glitchy, unnatural voice breaks and absurd, chaotic dialogue that added to the charm.
 
@@ -26,7 +38,13 @@ I knew I had to make my own version of it.
 
 ![A screenshot of the live chat from when my project was running](/assets/blog/ai-sponge/live_chat.png)
 
-<Callout emoji="💡">A screenshot of the live chat from when my project was running</Callout>
+<Callout emoji="💡">
+  A screenshot of the live chat from when my project was running
+</Callout>
+
+---
+
+<NewsletterCard />
 
 ---
 
@@ -53,11 +71,8 @@ I called the core module the **Generator**, because it created `.json` files for
 The process worked in a loop. It would:
 
 - Pick a random topic from a list
-    
 - Randomly select 2–3 characters from a pool of 8
-    
 - Choose a location and a transition
-    
 
 The location was a spot in a simple 3D model of Bikini Bottom, which I pulled from a sketchy Spongebob 3D fan-game site. The transition was a Spongebob-style scene change (e.g., _“X hours later…”_).
 
@@ -77,14 +92,17 @@ Each conversation entry followed this structure:
 
 ```json
 {
-	"role": "Spongebob",
-	"text": "Hey Patrick, have you seen Sandy around today?",
-	"uuid": "d5b4980b-8fca-493e-b6ea-0ee5697040ae",
-	"link": "https://uberduck-audio-outputs.s3-us-west-2.amazonaws.com/d5b4980b-8fca-493e-b6ea-0ee5697040ae/audio.wav"
+  "role": "Spongebob",
+  "text": "Hey Patrick, have you seen Sandy around today?",
+  "uuid": "d5b4980b-8fca-493e-b6ea-0ee5697040ae",
+  "link": "https://uberduck-audio-outputs.s3-us-west-2.amazonaws.com/d5b4980b-8fca-493e-b6ea-0ee5697040ae/audio.wav"
 }
 ```
 
-<Callout emoji="💡">Everything here is pretty self-explanatory. The final field, `link`, points to the generated voice file.</Callout>
+<Callout emoji="💡">
+  Everything here is pretty self-explanatory. The final field, `link`, points to
+  the generated voice file.
+</Callout>
 
 ---
 
@@ -96,7 +114,9 @@ Voice generation services were either too slow, low-quality, or paywalled. At th
 
 ![You can imagine the artifacts from AI trying to read this.](/assets/blog/ai-sponge/what.png)
 
-<Callout emoji="💡">You can imagine the artifacts from AI trying to read this.</Callout>
+<Callout emoji="💡">
+  You can imagine the artifacts from AI trying to read this.
+</Callout>
 
 Here’s where I got lucky: UberDuck had just introduced a “paid” plan, which limited new users to a small number of voice generations.
 
@@ -115,33 +135,26 @@ With a constant stream of conversation files being generated and dropped into a 
 I created a Unity scene and imported:
 
 - A 3D map of Bikini Bottom
-    
 - 3D models for all characters
-    
 
 ![When it was time to add new characters, we made polls to let the community decide](/assets/blog/ai-sponge/poll.png)
 
-<Callout emoji="💡">When it was time to add new characters, we made polls to let the community decide</Callout>
-
+<Callout emoji="💡">
+  When it was time to add new characters, we made polls to let the community
+  decide
+</Callout>
 
 (I won’t go into detail, but rigging, animating, and setting up new characters was one of the more labor-intensive parts.)
 
 Each scene followed these steps:
 
 - Load the latest conversation from the folder
-    
 - Read the `location` and place the camera accordingly
-    
 - Spawn the selected characters in front of the camera
-    
 - Set the camera to follow the first character speaking
-    
 - Stream and play the dialogue audio via the URL
-    
 - Display subtitles
-    
 - Move to the next line
-    
 
 After the scene finished, the file was moved into a `simulated` folder.
 
@@ -153,7 +166,9 @@ This was crucial. During downtimes (e.g., for maintenance or API issues), the si
 
 ![An old screenshot from when the project was running on twitch.](/assets/blog/ai-sponge/livetwitch2.png)
 
-<Callout emoji="💡">An old screenshot from when the project was running on twitch</Callout>
+<Callout emoji="💡">
+  An old screenshot from when the project was running on twitch
+</Callout>
 
 With everything in place, I ran the setup on my computer 24/7 and launched the YouTube livestream.
 
@@ -167,7 +182,6 @@ If anyone knows me, they also know I _love_ breaking the 4th wall. Anything that
 
 I couldn't miss this opportunity to atleast _do something_.
 
-
 The narrator voice was absolutely hilarious. It often cracked, stimmed, or just screamed, out of nowhere. It was probably something up with the accent and the low quality of the model, and it was _unsettling_.
 
 So I ended up generating some voice lines for the transitions saying wild stuff, such as the virtual narrator saying "Please Help Me", or "Make It Stop", as if he was being forced to work for the show.
@@ -180,9 +194,7 @@ Some other transition lines were just the narrator not saying anything, or at ot
 
 <Callout emoji="💡">The stream being self aware was hilarious</Callout>
 
-
 ---
-
 
 # Enabling Viewer Interactions
 
@@ -193,27 +205,20 @@ Also, API usage wasn’t cheap, so I created a simple business model to cover co
 ## Free Plan
 
 - New Discord users received 3 free topic suggestions
-    
 - Topics were submitted via the `#suggest-topics` channel
-    
 - Suggestions weren’t processed immediately: they went up for a vote
-    
 - Users could upvote/downvote suggestions with emoji reactions
-    
 - Once a suggestion received 10 green votes, it was added to the generation queue
-    
 
 This acted as a kind of crowd-sourced moderation system. It wasn’t perfect, but it filtered out most problematic suggestions.
 
 ![Guide for topics suggestions](/assets/blog/ai-sponge/guide.png)
-
 
 ## Donators
 
 Since voting meant your topic might never get picked, I introduced a **paid plan**.
 
 For $5, users could submit unlimited topic suggestions, basically skipping the 3/day limit.
-    
 
 Even donator suggestions still had to go through the public vote, but the low price and quick turnaround (within ~10 minutes) made it worthwhile.
 
@@ -226,11 +231,8 @@ I used a **Tebex** shop with a custom discord bot to manage purchases and submis
 As the project gained traction, I rolled out small updates:
 
 - Added new characters and locations
-    
 - Improved the overall scene flow
-    
 - Tweaked internal systems
-    
 
 Honestly, the codebase was held together with duct tape. When I started, I had no clue what the final system would look like, but it’s all part of learning. You build messy things first, and then, eventually, you learn how to recognize the mess and improve it.
 

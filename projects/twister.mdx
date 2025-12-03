@@ -7,17 +7,20 @@ tags: ["AI", "Game Dev"]
 published: true
 thumbnail: "/assets/blog/twister/thumbnail.png"
 ---
+
 import { Shield } from "../components/ui/shield";
+import { NewsletterCard } from "../components/newsletter-card";
 
 ![A screenshot from the final game.](/assets/blog/twister/penguinz1.png)
 
-
 A few months ago, I decided to participate in my first game jam. It was the end of summer, and I had a week left before starting my final year of university. With my exams done and nothing else on my plate, I opened Itch.io and started browsing for upcoming game jams. That’s when I stumbled upon the **Brackeys Game Jam 2024.2**, which was just about to begin.
 
-At first, I wasn’t sure whether to join. The theme hadn’t been announced, and I had no idea what kind of game I wanted to make or even what engine to use. It was one of those last-minute decisions where I thought, *Why not?* 
+At first, I wasn’t sure whether to join. The theme hadn’t been announced, and I had no idea what kind of game I wanted to make or even what engine to use. It was one of those last-minute decisions where I thought, _Why not?_
 
-One thing worth noting is that I had just finished developing my first-ever web-based game, called <Shield icon="twemoji:detective" href="https://spyfall.derewah.dev" text="SpyFall" />. It was a social deduction game with a React front-end and a backend server for networking. 
+One thing worth noting is that I had just finished developing my first-ever web-based game, called <Shield icon="twemoji:detective" href="https://spyfall.derewah.dev" text="SpyFall" />. It was a social deduction game with a React front-end and a backend server for networking.
 Having just taught myself React, I was still fresh with excitement from that project (you can read more about it in the <Shield icon="mdi:alpha-d-circle-outline" href="./spyfall" text="Spyfall Blog Post" />).
+
+<NewsletterCard />
 
 ## Getting Started: The Theme and Initial Hesitation
 
@@ -53,7 +56,7 @@ I also created a login screen that led into the game, though it didn’t really 
 
 <video controls className="w-full flex flex-row justify-center aspect-video">
   <source src="../assets/blog/twister/logging_in.mp4" type="video/mp4" />
-</ video>
+</video>
 
 My final vision for the game included features like replying to comments, having persistent conversations with AI-generated repliers, DMs, and even “drama events” where you’d battle against specific users to affect your reputation. Unfortunately, with only one week to work on it, I had to scrap a lot of those ideas.
 
@@ -63,7 +66,7 @@ My final vision for the game included features like replying to comments, having
 
 To rate the tweets, I wanted to use OpenAI’s API to determine whether the content was controversial. But I ran into a few challenges:
 
-**Security**: How do you securely store an API key on a frontend web app? I didn’t want anyone snooping around my code and using my OpenAI key at my expense. To solve this, I built a backend that acted as a middleman. The web app would send tweets to my backend, which would then call the OpenAI API, get a score, and send it back to the frontend. 
+**Security**: How do you securely store an API key on a frontend web app? I didn’t want anyone snooping around my code and using my OpenAI key at my expense. To solve this, I built a backend that acted as a middleman. The web app would send tweets to my backend, which would then call the OpenAI API, get a score, and send it back to the frontend.
 
 This backend solution had other advantages too: I could dynamically adjust how the tweets were rated, track game stats, and control costs, all without exposing my API key.
 
@@ -87,35 +90,35 @@ I also introduced a memory system. Commenters would remember your previous tweet
 
 <video controls className="w-full flex flex-row justify-center aspect-video">
   <source src="../assets/blog/twister/comments.mp4" type="video/mp4" />
-</ video>
+</video>
 
 Next, I implemented a “followers” counter to give the game a clear goal. The idea was to **survive as long as possible** by maintaining your follower count. If your tweets were too tame, people would lose interest and unfollow you. On the other hand, staying too controversial for too long would get you banned or canceled.
 
 <video controls className="w-full flex flex-row justify-center aspect-video">
   <source src="../assets/blog/twister/progress.mp4" type="video/mp4" />
-</ video>
+</video>
 
 ---
 
 ## The Final Stretch: Features and Fun Additions
 
-One of the fun mechanics I added was the ability to delete tweets. Deleting a tweet would instantly drop your “Bannable” score to zero, but people would notice, and the comments would update to reflect their anger at the deletion. 
+One of the fun mechanics I added was the ability to delete tweets. Deleting a tweet would instantly drop your “Bannable” score to zero, but people would notice, and the comments would update to reflect their anger at the deletion.
 
 <video controls className="w-full flex flex-row justify-center aspect-video">
   <source src="../assets/blog/twister/deletion.mp4" type="video/mp4" />
-</ video>
+</video>
 
-I also added “event triggers” for things that commonly happen in cancel culture. For example, one of my favorites was a random event where **Penguinz0** (a popular YouTuber) would tweet about your situation, causing a surge in controversy. 
+I also added “event triggers” for things that commonly happen in cancel culture. For example, one of my favorites was a random event where **Penguinz0** (a popular YouTuber) would tweet about your situation, causing a surge in controversy.
 
 <video controls className="w-full flex flex-row justify-center aspect-video">
   <source src="../assets/blog/twister/penguinz0.mp4" type="video/mp4" />
-</ video>
+</video>
 
-To make the game less frustrating, I included a “heart” and “warning” counter at the top of the screen to show how close you were to being canceled. 
+To make the game less frustrating, I included a “heart” and “warning” counter at the top of the screen to show how close you were to being canceled.
 
 <video controls className="w-full flex flex-row justify-center aspect-video">
   <source src="../assets/blog/twister/full.mp4" type="video/mp4" />
-</ video>
+</video>
 
 ---
 
@@ -134,5 +137,3 @@ Looking back, I’m certain that sharing my progress on Discord and engaging wit
 That’s a wrap on my first-ever game jam. I hope you enjoyed my story, and I’m definitely going to take part in more jams in the future. Stay tuned, and thanks for reading!
 
 Play <Shield icon="mdi:weather-windy" url="https://derewah.itch.io/twister">Twister</Shield> directly in the browser on Itch.io.
-
-

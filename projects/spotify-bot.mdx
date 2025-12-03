@@ -7,7 +7,9 @@ tags: ["Spotify", "Bots"]
 published: true
 thumbnail: "/assets/blog/spotify-bot/thumbnail.png"
 ---
+
 import { Shield } from "../components/ui/shield";
+import { NewsletterCard } from "../components/newsletter-card";
 
 # Can You Follow Every Single Person on the Planet on Spotify?
 
@@ -21,6 +23,10 @@ If you want to view the bot check out this [**github repo**](https://github.com/
 
 ---
 
+<NewsletterCard />
+
+---
+
 # The Two Main Challenges
 
 When considering this from a coder's perspective, two main challenges come to mind:
@@ -31,7 +37,7 @@ First, there's no way someone could manually follow millions of users. With numb
 
 ## 2. Finding Every User on the Platform
 
-The second challenge is discovering all the users on Spotify. There's no central place with a comprehensive list of users, so you need a way to "discover" each username automatically. Think about this in a broader sense: without the internet, how would you go about meeting as many people as possible? The key is **recursion**. 
+The second challenge is discovering all the users on Spotify. There's no central place with a comprehensive list of users, so you need a way to "discover" each username automatically. Think about this in a broader sense: without the internet, how would you go about meeting as many people as possible? The key is **recursion**.
 
 You start with one person, ask them to introduce you to everyone they know, then repeat this process with every new person you meet. Over time, you’d eventually meet almost everyone in the world (this skips over some graph theory concepts like the completeness of a graph and the idea that every node is connected).
 
@@ -43,7 +49,7 @@ Similarly, on Spotify, you could start with a random "patient zero" user, ideall
 
 ## Spotify API Endpoint Issues
 
-Initially, I was thrilled to find an endpoint in the Spotify API documentation that could query user information. Each user object returned by the API included fields like "followers" and "followings," which, according to the documentation, provided lists of all mutual accounts. However, when I tried to use this endpoint, it displayed a message that it was "not available at the moment." 
+Initially, I was thrilled to find an endpoint in the Spotify API documentation that could query user information. Each user object returned by the API included fields like "followers" and "followings," which, according to the documentation, provided lists of all mutual accounts. However, when I tried to use this endpoint, it displayed a message that it was "not available at the moment."
 
 ![Endpoint disabled at the moment](/assets/blog/spotify-bot/null.png)
 
@@ -53,7 +59,7 @@ My guess is that Spotify disabled this endpoint after people started abusing it 
 
 ## Spotify Engineers Are Working to Solve This
 
-The next issue arose when I began sending API requests to follow users. You can send requests with a list of up to 20 users you want to follow at a time. Initially, this worked well, but over time, the process became slower, and I started encountering Error 500 in about 50% of my requests. 
+The next issue arose when I began sending API requests to follow users. You can send requests with a list of up to 20 users you want to follow at a time. Initially, this worked well, but over time, the process became slower, and I started encountering Error 500 in about 50% of my requests.
 
 Spotify's API documentation humorously notes, "Our engineers are doing their best to prevent this from showing up, but if you still see this, whoopsie doopsie, sorry!" Despite my efforts to tweak the bot—adjusting the rate of follow requests and the number of user IDs per request—nothing seemed to help. Eventually, I concluded that Spotify must have implemented countermeasures against spam requests.
 
@@ -75,7 +81,7 @@ An amusing part of this journey was that I often received notifications of the t
 
 Naturally, the first question that comes to mind is: **Can money be made from this?**
 
-Well, I tried. I created some playlists with generic names, like "Halloween Vibes" (it was around Halloween), and people actually started liking and following them! I also included an email address in one of the playlists, just to see if anyone would contact me. To my surprise, some artists reached out, asking to be added to the playlist. 
+Well, I tried. I created some playlists with generic names, like "Halloween Vibes" (it was around Halloween), and people actually started liking and following them! I also included an email address in one of the playlists, just to see if anyone would contact me. To my surprise, some artists reached out, asking to be added to the playlist.
 
 Although I didn’t make any money and ignored the emails since the project was already over, it’s clear there’s potential to offer a service if you have successful playlists. There is demand, especially if your playlist gains popularity.
 

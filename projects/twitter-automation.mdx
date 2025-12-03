@@ -8,6 +8,7 @@ thumbnail: "/assets/blog/twitter-bot/thumbnail.png"
 ---
 
 import { Shield } from "../components/ui/shield";
+import { NewsletterCard } from "../components/newsletter-card";
 
 This story goes back quite a bit. This project was one of the first I ever created and marked one of my initial experiments with task automation using APIs. It dates back to a time before Twitter was rebranded as X, and even before Creator Payouts were introduced.
 
@@ -16,6 +17,10 @@ Exactly—this project started with **zero** monetary intent. Earning money thro
 Let’s start from the beginning.
 
 ![The page at the current stage.](/assets/blog/twitter-bot/page.jpg)
+
+<NewsletterCard />
+
+---
 
 # It Started as a Social Experiment
 
@@ -36,7 +41,7 @@ While browsing these accounts, I noticed something interesting—and exploitable
 On top of that, if you replied to a post more than 10 minutes after it was published (especially from big accounts), your reply would get buried under the more-liked ones posted earlier. So, the recipe was simple:
 
 - Post **as soon as possible**, ideally with automation (foreshadowing)
-- Post memes or other content designed to drive engagement    
+- Post memes or other content designed to drive engagement
 
 # Automating Posts and Replies
 
@@ -71,6 +76,7 @@ Over time, the account grew from 9.8k to over 30k followers.
 
 ![Another update from my old telegram portfolio](/assets/blog/twitter-bot/update1.png)
 _Some updates from a telegram channel where I was tracking progress on my projects_
+
 # Reaching 50k in 2 Months
 
 Around this time, I added a **Telegram interface**, letting me control the bot remotely and get notifications for errors.
@@ -83,6 +89,7 @@ But hey, the account was blowing up—**50k followers in just two months**, with
 
 ![The stats from a couple of months running the bot.](/assets/blog/twitter-bot/stats.jpg)
 _The stats from a couple of months of running the bot_
+
 # Twitter Rebrand and Meta Shifts
 
 A few months later, I slowly stopped working on the bot. Twitter (now X) introduced stricter limits on the UI API, making stability difficult.
@@ -91,7 +98,7 @@ Around the same time, Elon Musk acquired Twitter and rolled out major changes:
 
 - Paid subscriptions (including Blue checkmarks)
 - Creator Payouts based on impressions
-    
+
 At first, I didn’t care. I had moved on to other projects.
 
 But then I started seeing creators posting their earnings from impressions. And they were earning serious money. Honestly, with the traffic my account had been getting, I realized I might’ve missed out.
@@ -118,7 +125,7 @@ The account kept growing and now sits at around **80k followers**.
 
 Naturally, the next step was to replicate the success:
 
-- Pick a niche 
+- Pick a niche
 - Download a bulk set of content from Reddit or other sources
 - Run the bot with a different token
 - Buy Twitter Blue for the new account
@@ -144,10 +151,8 @@ One interesting insight: **the type of greentexts posted made a huge difference*
 The bot had two posting modes:
 
 - **Recent Mode**: Scrape the last 30 hot posts from the greentexts subreddit and cycle through them.
-![The bot scraping reddit](/assets/blog/twitter-bot/downloading.png)
-    
+  ![The bot scraping reddit](/assets/blog/twitter-bot/downloading.png)
 - **Top Mode**: Scrape the all-time top 1000 posts once and loop them indefinitely.
-    
 
 Turns out, people **love reading the same posts over and over again**. The second mode nearly **doubled** revenue compared to the first.
 
@@ -158,7 +163,6 @@ At first, I switched modes manually—activating the “Top” mode during weeke
 Since the bot replied automatically to a predefined set of accounts, it would comment on _anything_—even serious or sensitive posts.
 
 One time, someone posted a memorial for their dog, and a gimmick account I followed interacted with it. The bot replied with a random meme.
-
 
 Understandably, the original poster messaged me asking for its removal.
 
