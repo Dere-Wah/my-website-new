@@ -8,6 +8,7 @@ published: false
 
 import { Callout } from "../components/ui/callout";
 import { Shield } from "../components/ui/shield";
+import { SafeVideo } from "../components/safe-video";
 
 ## **A New Kind of Medium**
 
@@ -99,12 +100,24 @@ Because these models trained on huge collections of real videos, they started le
 
 They learned reality through observation.
 
+<SafeVideo
+  src="/assets/blog/world-models/water.mp4"
+  className="justify-center"
+  autoPlay
+  loop
+  muted
+  playsInline
+/>
+
 But these models also had two major limits:
 
-- The video length had to be decided before generation
+- The video length had to be decided before generation (10s)
 - The whole video had to be created at once before anything could be seen
 
 This is called **bidirectional generation**. Every frame depends on both the past and the future, so the model cannot generate the world step by step.
+
+![Imagination on the diamond
+paper.](/assets/blog/world-models/bidi-horse.png)
 
 That means no interaction. No control. No real time. No world you can *enter*.
 
@@ -126,15 +139,18 @@ Projects like DIAMOND, Dreamer and GameNGen fed models huge amounts of gameplay 
 - how the environment reacts to actions
 - how to simulate the entire game internally
 
+![Imagination on the diamond
+paper.](/assets/blog/world-models/imagination.gif)
+
 In other words, they learned **control**.
 
 But these models had the opposite problem of video models:
 
-- They could act, but their worlds were limited
-- They understood only the actions inside their dataset
-- They could not generalize beyond the game’s rules
+- They could act, but their worlds were limited (Only trained on ATARI games)
+- They understood only the actions inside their dataset (⬅️➡️↖️⬆️↗️↙️⬇️↘️🔥)
+- They could not generalize beyond the game’s rules (Cannot create a _new_ game)
 
-Where video models understood reality but could not interact, game models could interact but did not understand reality.
+#### **Where video models understood reality but could not interact, game models could interact but did not understand reality.**
 
 These two lines of research were moving toward the same destination but from opposite ends.
 
@@ -153,9 +169,23 @@ Researchers discovered how to turn a slow, bidirectional video diffusion model i
 - Prompts can be changed during generation
 - The world becomes controllable
 
+<SafeVideo
+  src="/assets/blog/world-models/odyssey.mp4"
+  className="justify-center"
+  autoPlay
+  loop
+  muted
+  playsInline
+/>
+
+<Callout emoji="💡">
+  Odyssey's latest product is built entirely on this technology, on the premise
+  of promptable real time video generation.
+</Callout>
+
 This is the moment where video models learn to act, and game models learn to generalize.
 
-The two paths merge into one.
+#### **The two paths merge into one.**
 
 ---
 
@@ -169,6 +199,15 @@ One of the most exciting parts of World Models is the ability to change the worl
 - switch to night
 
 This is the “thought” layer of the dream. But today, prompt control in autoregressive video systems is still weak. I have spent months experimenting with prompting for my own projects, and the limitations are clear.
+
+<SafeVideo
+  src="/assets/blog/world-models/sfe.mp4"
+  className="justify-center"
+  autoPlay
+  loop
+  muted
+  playsInline
+/>
 
 We are getting close, but not there yet.
 
@@ -185,11 +224,41 @@ Imagine the walls melt into water.
 Imagine the ground becomes grass.  
 Imagine you teleport to a beach with a single thought.
 
+<SafeVideo
+  src="/assets/blog/world-models/pov.mp4"
+  className="justify-center"
+  autoPlay
+  loop
+  muted
+  playsInline
+/>
+
+<Callout emoji="💡">
+  Video generated with Runway's Gen-4.5 model. (Bidirectional Video Model)
+</Callout>
+
 That is what a true World Model will feel like. A space that reacts to intention. A place made of learned physics, not fixed geometry. A world you can shape.
 
 The dream metaphor is not an accident. Early diffusion videos genuinely look like dreams. Shifting forms. Soft edges. Strange transitions. They are attempts at reality made from memory, not actual physics.
 
 World Models will turn those dreams into places you can inhabit.
+
+<div className="flex flex-row justify-center gap-2">
+  <div className="w-full md:w-1/2">
+    ![Dream screenshot](/assets/blog/world-models/dream1.jpg)
+  </div>
+  <div className="w-full md:w-1/2">
+    ![Dream screenshot](/assets/blog/world-models/dream2.jpg)
+  </div>
+  <div className="w-full md:w-1/2">
+    ![Dream screenshot](/assets/blog/world-models/dream3.jpg)
+  </div>
+</div>
+
+<Callout emoji="💡">
+  I generated these dream-like images back in 2021, while experimenting with a
+  Model that was trained on Minecraft screenshots.
+</Callout>
 
 ---
 
@@ -207,9 +276,27 @@ A tempting idea is to store everything as a 3D mesh. But this breaks the magic:
 
 Minecraft World Models show the issue clearly. Without proper memory, inventory items change randomly. You can fix it by hard coding inventory logic, but then you are locking the model into narrow, specific solutions. That approach will never scale.
 
+<SafeVideo
+  src="/assets/blog/world-models/decart.mov"
+  className="justify-center"
+  autoPlay
+  loop
+  muted
+  playsInline
+/>
+
 The only path forward is **implicit memory** memory stored inside the model’s latent space, not in human designed structures.
 
 DeepMind’s Genie 3 is leading this direction, with about one minute of memory. That may sound small, but compared to the few seconds of most open models, it is enormous.
+
+<SafeVideo
+  src="/assets/blog/world-models/genie3.mp4"
+  className="justify-center"
+  autoPlay
+  loop
+  muted
+  playsInline
+/>
 
 Implicit memory is the bridge that lets a World Model stay stable across time.
 
@@ -240,6 +327,21 @@ Humans learn the same way by bumping, testing, and failing.
 
 **You don’t understand that fire hurts you until you actually get burned.**
 
+<SafeVideo
+  src="/assets/blog/world-models/tesla.mp4"
+  className="justify-center"
+  autoPlay
+  loop
+  muted
+  playsInline
+/>
+
+<Callout emoji="💡">
+  This video is Tesla's World Model in action. You can see in the bottom right
+  corner inconsistencies such as the front grill of the truck changing in
+  between frames.
+</Callout>
+
 Robotics needs to experience the full tail of the distribution, but collecting it in reality would destroy hardware and cost a fortune. Video-based World Models solve this by learning rare events directly from large datasets. A model that has seen thousands of examples of a car crash can simulate one without crashing an actual car.
 
 This is the direction companies like Tesla are moving toward: training their systems inside a learned world before transferring the resulting policies to the real one.
@@ -248,10 +350,53 @@ This is the direction companies like Tesla are moving toward: training their sys
 
 ## **My Inspiration for the Future**
 
-A year and a half ago I trained a tiny Mario Kart World Model. I had no idea what I was touching. But that experiment led me to a community, to researchers, to San Francisco, to friendships and to a technology that I believe will define an era.
+A year and a half ago I trained a [tiny Mario Kart World Model](/projects/ai-mariokart). I had no idea what I was touching. But that experiment led me to a community, to researchers, to San Francisco, to friendships and to a technology that I believe will define an era.
 
 Every time I explain World Models to someone, they light up. They start imagining new applications within seconds. They see worlds that could exist and experiences we have never had before. That reaction is why I am writing this.
 
 So try this. Close your eyes. Imagine something from your past. A childhood home. A place you visited. Now imagine walking through it again. Imagine editing reality with a sentence. Imagine traveling anywhere instantly. Imagine entering worlds that never existed but feel as real as the ground under your feet.
+
+<div className="flex flex-wrap justify-center">
+  <SafeVideo
+    src="/assets/blog/world-models/dream-runway-1.mp4"
+    className="justify-center md:w-1/2"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
+  <SafeVideo
+    src="/assets/blog/world-models/dream-runway-2.mp4"
+    className="justify-center md:w-1/2"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
+  <SafeVideo
+    src="/assets/blog/world-models/dream-runway-3.mp4"
+    className="justify-center md:w-1/3"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
+  <SafeVideo
+    src="/assets/blog/world-models/dream-runway-4.mp4"
+    className="justify-center md:w-1/3"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
+  <SafeVideo
+    src="/assets/blog/world-models/dream-runway-5.mp4"
+    className="justify-center md:w-1/3"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
+</div>
 
 This is my vision for World Models. Today it is still a dream. But very soon, dreams will become something you can step inside.
