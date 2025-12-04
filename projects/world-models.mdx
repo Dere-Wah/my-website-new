@@ -13,7 +13,7 @@ import { NewsletterCard } from "../components/newsletter-card";
 
 ## **A New Kind of Medium**
 
-Imagine if you could step inside a dream. Not just watch it, but move around, change things, and see the world react in real time. Dreams feel loose and strange, yet they still follow rules gravity, motion, cause and effect. They feel alive.
+Imagine if you could step inside a dream. Not just watch it, but move around, change things, and see the world react in real time. Dreams feel loose and strange, yet they still follow rules like gravity, motion, cause and effect. They feel alive.
 
 Now imagine that instead of your brain generating that dream, an AI model is doing it. A model that has learned how the real world behaves well enough to *simulate* one. A model you can talk to, control, and shape.
 
@@ -40,7 +40,7 @@ World Models are the next leap. A completely new modality of intelligence. And b
 To understand where World Models come from, we need to look at two different paths that have been developing in parallel:
 
 1. **Video Models that learn reality by observing it**  
-   These models watch enormous amounts of real footage and learn how the world looks, moves and behaves. They generate videos from prompts and try to mimic real physics, lighting, motion and interactions. They have no fixed environment or rules beyond what exists in reality itself.
+   They learn how reality _looks_, mimicking textures, lighting, and motion patterns, without necessarily understanding the causal rules of how one moment leads to the next. They predict what a video should look like, not how a world works.
 
 <div className="flex flex-col md:flex-row justify-center items-center">
   <div className="w-full md:w-1/3">
@@ -58,7 +58,17 @@ To understand where World Models come from, we need to look at two different pat
 </div>
 
 2. **Models that learn games by acting inside them**  
-   These models learn from gameplay data. They discover how a specific game works: its actions, controls, rules, and how the environment responds. They do not learn the real world, but they learn how to *behave* inside a closed, controllable system.
+   This path is historically motivated by robotics, focusing on learning environment dynamics rather than just visuals. Think of algorithms playing Chess or Go: they don't need to predict pixels, but they understand the rules, the actions, and how the state of the game changes. These models learn how to _behave_ inside a closed, controllable system.
+
+<div className="flex flex-col md:flex-row justify-center items-center">
+  <div className="w-full md:w-1/2">
+    ![DeepMind's model, AlphaGo](/assets/blog/world-models/alphago.png.webp)
+  </div>
+</div>
+
+In games like Chess and Go, the observations represent the entire state of the game. Even if you only had a video of someone playing chess, it would be simple to extract the exact state (position of the pieces) with computer vision. But that is not the case in all games.
+
+In partially observable environments like Doom, or probabilistic ones like Minecraft, you can't infer the state from one observation (one frame). And that's where you need intelligent systems that understand and build an internal representation of the world.
 
 <div className="flex flex-col md:flex-row justify-center items-center">
   <div className="w-full md:w-1/2">
@@ -71,7 +81,7 @@ To understand where World Models come from, we need to look at two different pat
   </div>
 </div>
 
-At first, these paths seem unrelated. One learns how reality moves. The other learns how actions shape an environment. But if you follow these lines far enough, they start bending toward each other. And where they meet, the idea of a true World Model begins to form.
+When comparing Video Models and Game Models, these paths seem unrelated. One learns how reality moves. The other learns how actions shape an environment. But if you follow these lines far enough, they start bending toward each other. And where they meet, the idea of a true World Model begins to form.
 
 Let’s walk the path.
 
@@ -87,7 +97,7 @@ Image diffusion models were the first real breakthrough in visual generation. Th
 
 That was the first spark: a model that can imagine.
 
-But pictures are frozen moments. They do not have movement or memory. So researchers extended the idea by adding a new dimension time. Instead of a single image, the model now generates a whole block of frames. This is video diffusion.
+But pictures are frozen moments. They do not have movement or memory. So researchers extended the idea by adding a new dimension: time. Instead of a single image, the model now generates a whole block of frames. This is video diffusion.
 
     ![Bidirectional video
     diffusion](/assets/blog/world-models/bidirectional.jpg)
@@ -117,7 +127,7 @@ But these models also had two major limits:
 - The video length had to be decided before generation (10s)
 - The whole video had to be created at once before anything could be seen
 
-This is called **bidirectional generation**. Every frame depends on both the past and the future, so the model cannot generate the world step by step.
+In academia, this is usually called **full-sequence diffusion** or **non-causal generation** (sometimes referred to as bidirectional generation). Every frame depends on both the past and the future, so the model cannot generate the world step by step.
 
 ![Imagination on the diamond
 paper.](/assets/blog/world-models/bidi-horse.png)
@@ -145,7 +155,7 @@ Projects like DIAMOND, Dreamer and GameNGen fed models huge amounts of gameplay 
 ![Imagination on the diamond
 paper.](/assets/blog/world-models/imagination.gif)
 
-In other words, they learned **control**.
+In other words, they learned to be **action-conditioned** generators (where a policy can serve as a separate control module).
 
 But these models had the opposite problem of video models:
 
@@ -189,6 +199,15 @@ Researchers discovered how to turn a slow, bidirectional video diffusion model i
 This is the moment where video models learn to act, and game models learn to generalize.
 
 #### **The two paths merge into one.**
+
+<SafeVideo
+  src="/assets/blog/world-models/motionstream.mp4"
+  className="justify-center"
+  autoPlay
+  loop
+  muted
+  playsInline
+/>
 
 ---
 
