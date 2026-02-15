@@ -23,10 +23,10 @@ export default function About() {
       >
         <div className="space-y-4">
           <p className="text-lg leading-relaxed">
-            I'm <Birth /> exploring and <i>building something</i> in{" "}
+            I'm <Birth /> exploring and passionate about{" "}
             <Shield
-              text="San Francisco"
-              icon="twemoji:bridge-at-night"
+              text="World Models"
+              icon="twemoji:globe-showing-americas"
               variant="subtle"
             />
           </p>
