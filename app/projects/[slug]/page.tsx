@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Shield } from "@/components/ui/shield";
 import { Callout } from "@/components/ui/callout";
+import { Ghost } from "@/components/ui/ghost";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import SafeVideo from "@/components/safe-video";
@@ -192,6 +193,7 @@ export default async function ProjectPage({
                 Shield,
                 SafeVideo,
                 Callout,
+                Ghost,
                 NewsletterCard: (props: any) => (
                   <NewsletterCard {...props} variant="inline" />
                 ),
