@@ -23,13 +23,20 @@ export function Ghost({
       style={{
         position: "absolute",
         zIndex: 2147483647,
-        opacity: 0,
+        color: "transparent",
         pointerEvents: "none",
         userSelect: "none",
+        WebkitUserSelect: "none",
         top,
         bottom,
         left,
         right,
+        fontSize: "100%",
+        lineHeight: "100%",
+        overflow: "hidden",
+        width: "100%",
+        height: "100%",
+        boxShadow: "0.2px 0.2px 0.2px 0.2px black",
       }}
       className={className}
     >
