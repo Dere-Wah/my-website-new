@@ -101,11 +101,34 @@ export default async function ProjectPage({
                 {frontmatter.title}
               </h1>
 
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <CalendarIcon className="h-4 w-4" />
-                <time dateTime={frontmatter.date}>
-                  {format(new Date(frontmatter.date), "MMMM d, yyyy")}
-                </time>
+              <div className="flex items-center gap-4 text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <CalendarIcon className="h-4 w-4" />
+                  <time dateTime={frontmatter.date}>
+                    {format(new Date(frontmatter.date), "MMMM d, yyyy")}
+                  </time>
+                </div>
+                <span className="text-border">·</span>
+                <div className="flex items-center gap-2">
+                  <Image
+                    src="/davide-locatelli.jpeg"
+                    alt="Davide Locatelli"
+                    width={24}
+                    height={24}
+                    className="rounded-full object-cover"
+                  />
+                  <span className="text-sm">
+                    Written by{" "}
+                    <a
+                      href="https://www.linkedin.com/in/davide-locatelli-91a360304/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-foreground font-medium hover:underline"
+                    >
+                      Davide Locatelli
+                    </a>
+                  </span>
+                </div>
               </div>
             </div>
 
